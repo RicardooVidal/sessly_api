@@ -7,9 +7,11 @@
     "require": {
         "php": "^8.2",
         "darkaonline/l5-swagger": "^8.6",
+        "google/apiclient": "^2.19",
         "laravel/framework": "^11.9",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
+        "phpoffice/phpword": "^1.1",
         "spatie/data-transfer-object": "^3.9",
         "spatie/laravel-data": "^4.18"
     },

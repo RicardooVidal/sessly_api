@@ -23,6 +23,8 @@ use Illuminate\Support\Carbon;
  * @property string|null $notes
  * @property bool $done
  * @property float $value
+ * @property AppointmentTimeEnum $time,
+ * @property AppointmentTypeEnum $type,
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at

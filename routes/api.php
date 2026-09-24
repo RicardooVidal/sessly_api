@@ -1,19 +1,35 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\WaitListController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ContractController;
+use App\Http\Controllers\GoogleCalendarController;
+use App\Http\Middleware\CheckSchema;
 use Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
-use App\Http\Middleware\CheckSchema;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
+
+Route::get(
+    '/auth/google/callback',
+    [GoogleCalendarController::class, 'callback']
+);
+
+Route::middleware('auth:sanctum')->get(
+    '/google/connect',
+    [GoogleCalendarController::class, 'connect']
+);
+
+Route::middleware('auth:sanctum')->get(
+    '/google/testing',
+    [GoogleCalendarController::class, 'test']
+);
 
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')
