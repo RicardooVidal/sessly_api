@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
         if ($companies === 0) {
             Company::create([
                 'company' => 'ricardorodriguesvidal',
-                'name' => 'RICARDO RODRIGUES VIDAL 44072829838',
+                'name' => 'RICARDO RODRIGUES VIDAL',
                 'email' => 'ricardoorv95@gmail.com',
                 'document' => '36320890000166',
                 'until' => '2199-12-31'
