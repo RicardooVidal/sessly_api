@@ -173,11 +173,11 @@ class UpdateTest extends TestCase
             'date no passado' => [
                 ['date' => now()->subDays(5)->format('Y-m-d')]
             ],
-            'time inválido' => [
-                ['time' => 'invalid-time']
+            'medical_record inválido' => [
+                ['medical_record' => ['invalid-record']]
             ],
-            'type inválido' => [
-                ['type' => 'invalid-type']
+            'notes inválido' => [
+                ['notes' => ['invalid-notes']]
             ],
             'presence inválido' => [
                 ['presence' => 'aaa']

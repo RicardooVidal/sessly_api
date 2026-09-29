@@ -123,7 +123,7 @@ class AppointmentService
                 auth()->id()
             )->firstOrFail();
         } catch (ModelNotFoundException) {
-            Log::error('Conta do google para o usuário ' . auth()->id . ' não encontrado!');
+            Log::error('Conta do google para o usuário ' . auth()->id() . ' não encontrado!');
             return null;
         }
     }

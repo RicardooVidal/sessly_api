@@ -43,8 +43,7 @@ class ShowTest extends TestCase
             ->assertOk()
             ->assertJsonFragment([
                 'uuid' => $patient->uuid,
-                'first_name' => $patient->first_name,
-                'last_name' => $patient->last_name,
+                'name' => $patient->name,
                 'document' => $patient->document,
                 'active' => $patient->active,
                 'notes' => $patient->notes,
@@ -52,8 +51,7 @@ class ShowTest extends TestCase
             ->assertJsonStructure([
                 'data' => [
                     'uuid',
-                    'first_name',
-                    'last_name',
+                    'name',
                     'document',
                     'active',
                     'notes',

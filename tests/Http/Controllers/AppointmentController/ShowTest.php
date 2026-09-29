@@ -60,6 +60,7 @@ class ShowTest extends TestCase
                     'presence' => $appointment->presence->value,
                     'value' => $appointment->value,
                     'notes' => $appointment->notes,
+                    'medical_record' => null,
                     'patient' => [
                         'uuid' => $appointment->patient->uuid,
                         'name' => $appointment->patient->name,
@@ -84,7 +85,7 @@ class ShowTest extends TestCase
     public function erro(): void
     {
         $this->login();
-        $this->deleteJson($this->rota($this->faker->uuid))
+        $this->getJson($this->rota($this->faker->uuid))
             ->assertNotFound();
     }
 
@@ -98,7 +99,7 @@ class ShowTest extends TestCase
             ->withPatient()
             ->create();
 
-        $this->deleteJson($this->rota($appointment->uuid))
+        $this->getJson($this->rota($appointment->uuid))
             ->assertUnauthorized();
     }
 }

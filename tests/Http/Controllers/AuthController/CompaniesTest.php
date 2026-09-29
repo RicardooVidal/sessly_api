@@ -36,14 +36,14 @@ class CompaniesTest extends TestCase
     {
         $user = User::factory()->withCompany()->create();
 
-        $this
-            ->getJson($this->rota($user->uuid))->ddJson()
+        $this->actingAs($user)
+            ->getJson($this->rota($user->uuid))
             ->assertOk()
             ->assertJsonFragments([
                 'data' => [
                     [
                         'uuid' => $user->company->uuid,
-                        'company' => $user->company->company,
+                        'company' => $user->company->name,
                     ]
                 ]
             ])

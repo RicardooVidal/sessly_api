@@ -40,7 +40,7 @@ class ContractData extends Data
             uuid: $contract->uuid,
             description: $contract->description,
             patient: $contract->relationLoaded('patient')
-                ? PatientData::from($contract->patient->only(['id', 'uuid', 'first_name', 'last_name']))
+                ? PatientData::from($contract->patient->only(['id', 'uuid', 'name']))
                 : Optional::create(),
             validUntil: $contract->valid_until,
             documentUrl: $contract->document_url,

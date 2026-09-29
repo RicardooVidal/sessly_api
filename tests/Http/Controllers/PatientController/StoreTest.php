@@ -163,10 +163,10 @@ class StoreTest extends TestCase
                 ['notes' => true]
             ],
             'type inválido' => [
-                'type' => 'aaa'
+                ['type' => 'aaa']
             ],
             'time inválido' => [
-                'time' => true
+                ['time' => true]
             ]
         ];
     }

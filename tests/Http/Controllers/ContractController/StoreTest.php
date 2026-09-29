@@ -77,15 +77,19 @@ class StoreTest extends TestCase
                     'description' => $parametros['description'],
                     'patient' => [
                         'uuid' => $patient->uuid,
-                        'first_name' => $patient->first_name,
-                        'last_name' => $patient->last_name,
+                        'name' => $patient->name,
+                        'phone' => null,
+                        'gender' => null,
+                        'email' => null,
+                        'type' => null,
+                        'time' => null,
                         'active' => null,
                         'document' => null,
                         'notes' => null,
                     ],
                     'valid_until' => $date->toW3cString(),
                     'file' => null,
-                    'document' => 'contracts/contract_patient_' . $patient->uuid . '.pdf',
+                    'document_url' => Storage::disk('app_files')->url('contracts/contract_patient_' . $patient->uuid . '.pdf'),
                 ]
             ]);
     }

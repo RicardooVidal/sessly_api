@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('medical_records', function (Blueprint $table) {
-            $table->dropForeign($table->getTable() . '_appointment_id_foreign');
+            $table->dropForeign(['appointment_id']);
             $table->dropColumn('appointment_id');
             $table->bigInteger('patient_id');
             $table->uuid()->after('id');
@@ -26,7 +26,7 @@ return new class extends Migration
             $table->foreign('appointment_id')->references('id')->on('appointments');
             $table->dropColumn('uuid');
             $table->dropSoftDeletes();
-            $table->dropForeign($table->getTable() . '_patient_id_foreign');
+            $table->dropForeign(['patient_id']);
             $table->dropColumn('patient_id');
         });
     }
