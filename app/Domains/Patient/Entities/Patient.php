@@ -11,8 +11,10 @@ use Database\Factories\PatientFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 
 /**
  * @property-read int $id
@@ -28,6 +30,8 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
+ *
+ * @property MedicalRecord $medicalRecord
  *
  * @method static PatientFactory factory($count = null, $state = [])
  */
@@ -56,6 +60,11 @@ class Patient extends Model
             'type' => AppointmentTypeEnum::class,
             'time' => AppointmentTimeEnum::class,
         ];
+    }
+
+    public function medicalRecord(): HasOne
+    {
+        return $this->hasOne(MedicalRecord::class);
     }
 
     public static function newFactory(): PatientFactory

@@ -12,22 +12,26 @@ use App\Enums\PresenceEnum;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 use Spatie\LaravelData\Attributes\FromRouteParameterProperty;
+use Spatie\LaravelData\Attributes\MapName;
 use Spatie\LaravelData\Attributes\WithCast;
 use Spatie\LaravelData\Data;
+use Spatie\LaravelData\Mappers\SnakeCaseMapper;
 use Spatie\LaravelData\Optional;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
 
+#[MapName(SnakeCaseMapper::class)]
 class AppointmentData extends Data
 {
     public function __construct(
         #[FromRouteParameterProperty('appointment')]
         public ?string $uuid = null,
-        public PatientData $patient,
+        public ?PatientData $patient,
         #[WithCast(CarbonCast::class)]
         public ?Carbon $date = null,
         public ?PresenceEnum $presence,
         public ?float $value,
         public ?string $notes,
+        public ?string $medicalRecord,
     )
     {}
 
@@ -37,11 +41,12 @@ class AppointmentData extends Data
             uuid: $appointment->uuid,
             patient: $appointment->relationLoaded('patient')
                 ? PatientData::from($appointment->patient->only(['id', 'uuid', 'name', 'time', 'type',]))
-                : Optional::create(),
+                : null,
             date: $appointment->date,
             presence: $appointment->presence,
             value: $appointment->value,
             notes: $appointment->notes,
+            medicalRecord: null,
         );
     }
 
@@ -69,6 +74,10 @@ class AppointmentData extends Data
                 'nullable',
                 'string',
                 'max:500',
+            ],
+            'medical_record' => [
+                'nullable',
+                'string',
             ]
         ];
     }

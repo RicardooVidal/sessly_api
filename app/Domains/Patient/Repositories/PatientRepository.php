@@ -4,6 +4,7 @@ namespace App\Domains\Patient\Repositories;
 
 use App\Data\Patient\IndexPatientData;
 use App\Data\Patient\PatientData;
+use App\Domains\Patient\Entities\MedicalRecord;
 use App\Domains\Patient\Entities\Patient;
 use App\Helpers\DocumentHelper;
 use App\Scopes\PatientScope;

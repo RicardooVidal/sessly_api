@@ -13,7 +13,9 @@
         "laravel/tinker": "^2.9",
         "phpoffice/phpword": "^1.1",
         "spatie/data-transfer-object": "^3.9",
-        "spatie/laravel-data": "^4.18"
+        "spatie/laravel-data": "^4.18",
+        "ext-dom": "*",
+        "ext-libxml": "*"
     },
     "require-dev": {
         "brianium/paratest": "^7.8",

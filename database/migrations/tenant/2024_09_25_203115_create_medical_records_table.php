@@ -27,7 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Drop the table instead of dropping foreign keys by name (not supported by SQLite)
         Schema::dropIfExists('medical_records');
     }
 };

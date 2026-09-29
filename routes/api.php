@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\MedicalRecordController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\WaitListController;
 use App\Http\Controllers\AppointmentController;
@@ -53,6 +54,13 @@ Route::get('/companies', [AuthController::class, 'companies'])
 
         Route::resource('appointment', AppointmentController::class)->except(['update']);
         Route::put('appointment', [AppointmentController::class, 'update'])->name('appointment.update');
+
+        Route::get('/medical-record/get-by-patient/{uuid}', [MedicalRecordController::class, 'getMedicalRecord'])
+            ->whereUuid('uuid')
+            ->name('medical-record.get-by-patient');
+
+        Route::post('/medical-record/import', [MedicalRecordController::class, 'importMedicalRecord'])
+            ->name('medical-record.import');
 
         Route::resources([
             'payment' => PaymentController::class
