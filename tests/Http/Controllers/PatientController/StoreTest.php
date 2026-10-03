@@ -43,6 +43,8 @@ class StoreTest extends TestCase
             'gender' => $this->faker->randomElement(GenderEnum::cases()),
             'email' => $this->faker->email,
             'active' => true,
+            'create_appointments' => true,
+            'notify_appointment' => false,
             'notes' => $this->faker->text,
             'type' => $this->faker->randomElement(AppointmentTypeEnum::cases()),
             'time' => $this->faker->randomElement(AppointmentTimeEnum::cases()),
@@ -60,6 +62,8 @@ class StoreTest extends TestCase
                 'gender' => $parametros['gender'],
                 'email' => $parametros['email'],
                 'active' => $parametros['active'],
+                'create_appointments' => $parametros['create_appointments'],
+                'notify_appointment' => $parametros['notify_appointment'],
                 'notes' => $parametros['notes'],
                 'type' => $parametros['type'],
                 'time' => $parametros['time'],
@@ -73,6 +77,8 @@ class StoreTest extends TestCase
                     'gender',
                     'email',
                     'active',
+                    'create_appointments',
+                    'notify_appointment',
                     'notes',
                     'type',
                     'time',
@@ -110,6 +116,8 @@ class StoreTest extends TestCase
             'gender' => $this->faker->randomElement(GenderEnum::cases()),
             'email' => $this->faker->email,
             'active' => true,
+            'create_appointments' => true,
+            'notify_appointment' => true,
             'notes' => $this->faker->text,
             'type' => $this->faker->randomElement(AppointmentTypeEnum::cases()),
             'time' => $this->faker->randomElement(AppointmentTimeEnum::cases()),
@@ -155,6 +163,12 @@ class StoreTest extends TestCase
            ],
             'active inválido' => [
                 ['active' => 'invalido']
+            ],
+            'create_appointments inválido' => [
+                ['create_appointments' => 'teste']
+            ],
+            'notify_appointment inválido' => [
+                ['notify_appointment' => 'teste']
             ],
             'gender inválido' => [
                 ['gender' => 'invalido']

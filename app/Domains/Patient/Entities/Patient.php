@@ -22,6 +22,8 @@ use Illuminate\Support\Collection;
  * @property string $name
  * @property string $document
  * @property bool $active
+ * @property bool $create_appointments
+ * @property bool $notify_appointment
  * @property string|null $notes
  * @property bool $done
  * @property float $value
@@ -45,6 +47,8 @@ class Patient extends Model
         'name',
         'document',
         'active',
+        'create_appointments',
+        'notify_appointment',
         'phone',
         'gender',
         'email',
