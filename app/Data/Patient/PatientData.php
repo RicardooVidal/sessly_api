@@ -29,6 +29,7 @@ class PatientData extends Data
         public ?bool $create_appointments = null,
         public ?bool $notify_appointment = null,
         public ?string $notes = null,
+        public ?float $value = null,
         public ?AppointmentTypeEnum $type = null,
         public ?AppointmentTimeEnum $time = null,
     )
@@ -70,6 +71,7 @@ class PatientData extends Data
             'notes' => ['nullable', 'string', 'max:500'],
             'type' => ['required', Rule::enum(AppointmentTypeEnum::class)],
             'time' => ['required', Rule::enum(AppointmentTimeEnum::class)],
+            'value' => ['nullable', 'numeric']
         ];
     }
 }

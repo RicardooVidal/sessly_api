@@ -55,6 +55,7 @@ class Patient extends Model
         'notes',
         'type',
         'time',
+        'value',
     ];
 
     protected function casts(): array
@@ -63,6 +64,7 @@ class Patient extends Model
             'gender' => GenderEnum::class,
             'type' => AppointmentTypeEnum::class,
             'time' => AppointmentTimeEnum::class,
+            'value' => 'float',
         ];
     }
 

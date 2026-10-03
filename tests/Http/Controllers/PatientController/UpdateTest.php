@@ -48,6 +48,7 @@ class UpdateTest extends TestCase
             'create_appointments' => true,
             'notify_appointment' => false,
             'notes' => $this->faker->text,
+            'value' => $this->faker->randomFloat(),
             'type' => $this->faker->randomElement(AppointmentTypeEnum::cases()),
             'time' => $this->faker->randomElement(AppointmentTimeEnum::cases()),
         ];
@@ -68,6 +69,7 @@ class UpdateTest extends TestCase
                 'create_appointments' => $parametros['create_appointments'],
                 'notify_appointment' => $parametros['notify_appointment'],
                 'notes' => $parametros['notes'],
+                'value' => $parametros['value'],
                 'type' => $parametros['type'],
                 'time' => $parametros['time'],
             ])
@@ -82,6 +84,7 @@ class UpdateTest extends TestCase
                     'create_appointments',
                     'notify_appointment',
                     'notes',
+                    'value',
                     'type',
                     'time',
                 ]
@@ -104,6 +107,7 @@ class UpdateTest extends TestCase
             'create_appointments' => true,
             'notify_appointment' => false,
             'notes' => $this->faker->text,
+            'value' => $this->faker->randomFloat(),
             'type' => $this->faker->randomElement(AppointmentTypeEnum::cases()),
             'time' => $this->faker->randomElement(AppointmentTimeEnum::cases()),
         ];
@@ -149,6 +153,7 @@ class UpdateTest extends TestCase
             'create_appointments' => true,
             'notify_appointment' => false,
             'notes' => $this->faker->text,
+            'value' => $this->faker->randomFloat(),
             'type' => $this->faker->randomElement(AppointmentTypeEnum::cases()),
             'time' => $this->faker->randomElement(AppointmentTimeEnum::cases()),
         ];
@@ -202,6 +207,9 @@ class UpdateTest extends TestCase
             ],
             'notify_appointment inválido' => [
                 ['notify_appointment' => 'teste']
+            ],
+            'value inválido' => [
+                ['value' => 'inválido']
             ],
             'notes inválido' => [
                 ['notes' => true]

@@ -46,6 +46,7 @@ class StoreTest extends TestCase
             'create_appointments' => true,
             'notify_appointment' => false,
             'notes' => $this->faker->text,
+            'value' => $this->faker->randomFloat(),
             'type' => $this->faker->randomElement(AppointmentTypeEnum::cases()),
             'time' => $this->faker->randomElement(AppointmentTimeEnum::cases()),
         ];
@@ -65,6 +66,7 @@ class StoreTest extends TestCase
                 'create_appointments' => $parametros['create_appointments'],
                 'notify_appointment' => $parametros['notify_appointment'],
                 'notes' => $parametros['notes'],
+                'value' => $parametros['value'],
                 'type' => $parametros['type'],
                 'time' => $parametros['time'],
             ])
@@ -79,6 +81,7 @@ class StoreTest extends TestCase
                     'active',
                     'create_appointments',
                     'notify_appointment',
+                    'value',
                     'notes',
                     'type',
                     'time',
@@ -118,6 +121,7 @@ class StoreTest extends TestCase
             'active' => true,
             'create_appointments' => true,
             'notify_appointment' => true,
+            'value' => $this->faker->randomFloat(),
             'notes' => $this->faker->text,
             'type' => $this->faker->randomElement(AppointmentTypeEnum::cases()),
             'time' => $this->faker->randomElement(AppointmentTimeEnum::cases()),
@@ -170,6 +174,9 @@ class StoreTest extends TestCase
             'notify_appointment inválido' => [
                 ['notify_appointment' => 'teste']
             ],
+            'value inválido' => [
+                ['value' => 'inválido']
+            ] ,
             'gender inválido' => [
                 ['gender' => 'invalido']
             ],
