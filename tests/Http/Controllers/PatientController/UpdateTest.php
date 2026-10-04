@@ -43,6 +43,7 @@ class UpdateTest extends TestCase
             'document' => $this->faker->cpf(false),
             'phone' => $this->faker->phoneNumber,
             'gender' => $this->faker->randomElement(GenderEnum::cases()),
+            'day' => 3,
             'email' => $this->faker->email,
             'active' => false,
             'create_appointments' => true,
@@ -64,6 +65,7 @@ class UpdateTest extends TestCase
                 'document' => $parametros['document'],
                 'phone' => $parametros['phone'],
                 'gender' => $parametros['gender'],
+                'day' => $parametros['day'],
                 'email' => $parametros['email'],
                 'active' => $parametros['active'],
                 'create_appointments' => $parametros['create_appointments'],
@@ -79,6 +81,7 @@ class UpdateTest extends TestCase
                     'document',
                     'phone',
                     'gender',
+                    'day',
                     'email',
                     'active',
                     'create_appointments',
@@ -102,6 +105,7 @@ class UpdateTest extends TestCase
             'document' => $this->faker->cpf(false),
             'phone' => $this->faker->phoneNumber,
             'gender' => $this->faker->randomElement(GenderEnum::cases()),
+            'day' => 3,
             'email' => $this->faker->email,
             'active' => false,
             'create_appointments' => true,
@@ -148,6 +152,7 @@ class UpdateTest extends TestCase
             'document' => $this->faker->cpf(false),
             'phone' => $this->faker->phoneNumber,
             'gender' => $this->faker->randomElement(GenderEnum::cases()),
+            'day' => 3,
             'email' => $this->faker->email,
             'active' => false,
             'create_appointments' => true,
@@ -195,6 +200,9 @@ class UpdateTest extends TestCase
             ],
             'email max' => [
                 ['email' => str_repeat('a', 101)]
+            ],
+            'day inválido' => [
+                ['day' => 'inválido']
             ],
             'gender inválido' => [
                 ['gender' => 'invalido']

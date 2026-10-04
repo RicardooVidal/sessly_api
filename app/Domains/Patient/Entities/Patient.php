@@ -29,6 +29,7 @@ use Illuminate\Support\Collection;
  * @property float $value
  * @property AppointmentTimeEnum $time,
  * @property AppointmentTypeEnum $type,
+ * @property int $day,
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
@@ -49,6 +50,7 @@ class Patient extends Model
         'active',
         'create_appointments',
         'notify_appointment',
+        'day',
         'phone',
         'gender',
         'email',

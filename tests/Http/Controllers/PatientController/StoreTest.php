@@ -41,6 +41,7 @@ class StoreTest extends TestCase
             'document' => $this->faker->cpf(false),
             'phone' => $this->faker->phoneNumber,
             'gender' => $this->faker->randomElement(GenderEnum::cases()),
+            'day' => 3,
             'email' => $this->faker->email,
             'active' => true,
             'create_appointments' => true,
@@ -61,6 +62,7 @@ class StoreTest extends TestCase
                 'document' => $parametros['document'],
                 'phone' => $parametros['phone'],
                 'gender' => $parametros['gender'],
+                'day' => $parametros['day'],
                 'email' => $parametros['email'],
                 'active' => $parametros['active'],
                 'create_appointments' => $parametros['create_appointments'],
@@ -77,6 +79,7 @@ class StoreTest extends TestCase
                     'document',
                     'phone',
                     'gender',
+                    'day',
                     'email',
                     'active',
                     'create_appointments',
@@ -117,6 +120,7 @@ class StoreTest extends TestCase
             'document' => $this->faker->cpf(false),
             'phone' => $this->faker->phoneNumber,
             'gender' => $this->faker->randomElement(GenderEnum::cases()),
+            'day' => 3,
             'email' => $this->faker->email,
             'active' => true,
             'create_appointments' => true,
@@ -177,6 +181,9 @@ class StoreTest extends TestCase
             'value inválido' => [
                 ['value' => 'inválido']
             ] ,
+            'day inválido' => [
+                ['day' => 'inválido']
+            ],
             'gender inválido' => [
                 ['gender' => 'invalido']
             ],

@@ -14,7 +14,7 @@ use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Mappers\SnakeCaseMapper;
 use Spatie\LaravelData\Support\Validation\ValidationContext;
 
-#[Type, MapName(SnakeCaseMapper::class)]
+#[MapName(SnakeCaseMapper::class)]
 class PatientData extends Data
 {
     public function __construct(
@@ -24,6 +24,7 @@ class PatientData extends Data
         public ?string $document = null,
         public ?string $phone = null,
         public ?GenderEnum $gender = null,
+        public ?int $day = null,
         public ?string $email = null,
         public ?bool $active = null,
         public ?bool $create_appointments = null,
