@@ -44,6 +44,7 @@ class AppointmentRepository
                 fn(Builder $query, $patientUuid) =>
                 $query->whereHas('patient', fn ($q) => $q->where('uuid', $patientUuid))
             )
+            ->orderByDesc('date')
             ->get()
             ->makeHidden('patient_id');
     }

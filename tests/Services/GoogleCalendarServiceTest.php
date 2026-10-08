@@ -13,6 +13,7 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Facades\Log;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestDox;
 use Tests\TestCase;
@@ -20,6 +21,9 @@ use Illuminate\Support\Str;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 
+/**
+ * @see GoogleCalendarService
+ */
 class GoogleCalendarServiceTest extends TestCase
 {
     #[Test, TestDox('Deve configurar o cliente com acesso offline ao calendário')]
@@ -119,6 +123,62 @@ class GoogleCalendarServiceTest extends TestCase
         ];
     }
 
+    #[DataProvider('operacoesReuniaoDataProvider')]
+    #[Test, TestDox('Deve registrar no log o erro da API ao criar ou atualizar uma reunião')]
+    public function erroApiReuniao(string $operation, string $method, string $path): void
+    {
+        Log::spy();
+        $history = [];
+        $service = $this->criarServicoComResposta(
+            new Response(403, ['Content-Type' => 'application/json'], '{"error":{"code":403,"message":"Forbidden"}}'),
+            $history
+        );
+        $start = Carbon::parse('2026-10-10 09:00:00', 'America/Sao_Paulo');
+        $args = [new GoogleAccount, 'Consulta de João', $start, $start->copy()->addMinutes(50)];
+        if ($operation === 'updateMeeting') {
+            array_unshift($args, 'event-test');
+        }
+
+        try {
+            $this->assertNull($service->{$operation}(...$args));
+        } finally {
+            Log::shouldHaveReceived('error')->once()->with(
+                'Não foi possível criar a chamada no meet',
+                Mockery::on(fn(array $context) => ($context['exception'] ?? null) instanceof GoogleException
+                    && $context['exception']->getCode() === 403
+                    && str_contains($context['exception']->getMessage(), 'Forbidden'))
+            );
+            $this->assertCount(1, $history);
+            $this->assertSame($method, $history[0]['request']->getMethod());
+            $this->assertSame($path, $history[0]['request']->getUri()->getPath());
+        }
+    }
+
+    #[DataProvider('operacoesReuniaoDataProvider')]
+    #[Test, TestDox('Deve registrar no log o erro de autenticação ao criar ou atualizar uma reunião')]
+    public function erroAutenticacaoReuniao(string $operation, string $method, string $path): void
+    {
+        Log::spy();
+        $account = new GoogleAccount;
+        $exception = new \RuntimeException('Token revogado');
+        $service = Mockery::mock(GoogleCalendarService::class)->makePartial();
+        $service->shouldReceive('authenticatedClient')->once()->with($account)->andThrow($exception);
+        $start = Carbon::parse('2026-10-10 09:00:00', 'America/Sao_Paulo');
+        $args = [$account, 'Consulta de João', $start, $start->copy()->addMinutes(50)];
+        if ($operation === 'updateMeeting') {
+            array_unshift($args, 'event-test');
+        }
+
+        try {
+            $this->assertNull($service->{$operation}(...$args));
+        } finally {
+            Log::shouldHaveReceived('error')->once()->with(
+                'Não foi possível criar a chamada no meet',
+                ['exception' => $exception]
+            );
+        }
+    }
+
     #[Test, TestDox('Deve excluir o evento informado do calendário')]
     public function sucessoExclusao(): void
     {
@@ -130,13 +190,39 @@ class GoogleCalendarServiceTest extends TestCase
         $this->assertSame('/calendar/v3/calendars/primary/events/event-test', $history[0]['request']->getUri()->getPath());
     }
 
-    #[Test, TestDox('Deve propagar o erro retornado pela API do Google')]
+    #[Test, TestDox('Deve registrar no log o erro da API ao excluir uma reunião')]
     public function erroApiGoogle(): void
     {
+        Log::spy();
         $history = [];
         $service = $this->criarServicoComResposta(new Response(403, ['Content-Type' => 'application/json'], '{"error":{"code":403,"message":"Forbidden"}}'), $history);
-        $this->expectException(GoogleException::class);
-        $this->expectExceptionCode(403);
         $service->deleteMeeting('event-test', new GoogleAccount);
+
+        Log::shouldHaveReceived('error')->once()->with(
+            'Não foi possível remover a chamada no meet',
+            Mockery::on(fn(array $context) => ($context['exception'] ?? null) instanceof GoogleException
+                && $context['exception']->getCode() === 403
+                && str_contains($context['exception']->getMessage(), 'Forbidden'))
+        );
+        $this->assertCount(1, $history);
+        $this->assertSame('DELETE', $history[0]['request']->getMethod());
+        $this->assertSame('/calendar/v3/calendars/primary/events/event-test', $history[0]['request']->getUri()->getPath());
+    }
+
+    #[Test, TestDox('Deve registrar no log o erro de autenticação ao excluir uma reunião')]
+    public function erroAutenticacaoExclusao(): void
+    {
+        Log::spy();
+        $account = new GoogleAccount;
+        $exception = new \RuntimeException('Token revogado');
+        $service = Mockery::mock(GoogleCalendarService::class)->makePartial();
+        $service->shouldReceive('authenticatedClient')->once()->with($account)->andThrow($exception);
+
+        $service->deleteMeeting('event-test', $account);
+
+        Log::shouldHaveReceived('error')->once()->with(
+            'Não foi possível remover a chamada no meet',
+            ['exception' => $exception]
+        );
     }
 }

@@ -57,4 +57,15 @@ class PatientRepository
     {
         $this->patient->where('uuid', $uuid)->firstOrFail()?->delete();
     }
+
+    public function getOptionsForAppointment(string $uuid): ?Patient
+    {
+        return $this->patient->query()
+            ->where('uuid', $uuid)
+            ->select([
+                'uuid',
+                'day',
+                'value'
+            ])->firstOrFail();
+    }
 }

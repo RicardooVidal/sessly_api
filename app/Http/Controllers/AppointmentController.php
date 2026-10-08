@@ -17,12 +17,9 @@ class AppointmentController extends Controller
 {
     public function __construct(
         private readonly AppointmentService $appointmentService,
-        private readonly PhpWordService $phpWordService,
     ) {}
 
     /**
-     * @param IndexAppointmentData $request
-     * @return JsonResponse
      * @see IndexTest
      */
     public function index(IndexAppointmentData $filters): JsonResponse

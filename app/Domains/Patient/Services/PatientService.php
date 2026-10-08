@@ -45,8 +45,8 @@ class PatientService
         $this->patientRepository->delete($uuid);
     }
 
-    public function importMedicalRecord(string $patientUuid, string $filePath): void
+    public function getOptionsForAppointment(string $uuid): PatientData
     {
-        $this->patientRepository->updateOrCreateMedicalRecord($patientUuid, $filePath);
+        return PatientData::from($this->patientRepository->getOptionsForAppointment($uuid));
     }
 }

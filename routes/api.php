@@ -45,6 +45,9 @@ Route::get('/companies', [AuthController::class, 'companies'])
         Route::resource('patient', PatientController::class)->except(['update']);
         Route::group(['prefix' => 'patient', 'as' => 'patient.'], function () {
             Route::get('/select/get', [PatientController::class, 'select'])->name('select');
+            Route::get('/options-appointments/get/{patient:uuid}', [PatientController::class, 'getOptionsForAppointment'])
+                ->whereUuid('uuid')
+                ->name('options-appointments');
             Route::put('/', [PatientController::class, 'update'])->name('update');
         });
 

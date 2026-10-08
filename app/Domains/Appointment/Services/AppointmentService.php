@@ -52,10 +52,12 @@ class AppointmentService
                 end: $appointment->date->addMinutes($appointment->patient->time->value),
             );
 
-            $appointment->update([
-                'google_event_id' => $event->getId(),
-                'google_meet_url' => $event->getHangoutLink(),
-            ]);
+            if ($event) {
+                $appointment->update([
+                    'google_event_id' => $event->getId(),
+                    'google_meet_url' => $event->getHangoutLink(),
+                ]);
+            }
         }
 
         $this->checkMedicalRecord($appointmentData, $appointment);
@@ -85,10 +87,12 @@ class AppointmentService
                 end: $appointment->date->addMinutes($appointment->patient->time->value),
             );
 
-            $appointment->update([
-                'google_event_id' => $event->getId(),
-                'google_meet_url' => $event->getHangoutLink(),
-            ]);
+            if ($event) {
+                $appointment->update([
+                    'google_event_id' => $event->getId(),
+                    'google_meet_url' => $event->getHangoutLink(),
+                ]);
+            }
         }
 
         $this->checkMedicalRecord($appointmentData, $appointment);

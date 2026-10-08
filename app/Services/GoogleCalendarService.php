@@ -8,8 +8,14 @@ use Google\Client;
 use Google\Service\Calendar;
 use Google\Service\Calendar\Event;
 use Google\Service\Exception;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Tests\Services\GoogleCalendarServiceTest;
+use Throwable;
 
+/**
+ * @see GoogleCalendarServiceTest
+ */
 class GoogleCalendarService
 {
     public function client(): Client
@@ -40,42 +46,50 @@ class GoogleCalendarService
         string $name,
         Carbon $start,
         Carbon $end
-    ): Event {
-        $client = $this->authenticatedClient($googleAccount);
+    ): ?Event {
+        try {
+            $client = $this->authenticatedClient($googleAccount);
 
-        $calendar = new Calendar($client);
+            $calendar = new Calendar($client);
 
-        $event = new Event([
-            'summary' => $name,
+            $event = new Event([
+                'summary' => $name,
 
-            'start' => [
-                'dateTime' => $start->format(DATE_RFC3339),
-                'timeZone' => 'America/Sao_Paulo',
-            ],
+                'start' => [
+                    'dateTime' => $start->format(DATE_RFC3339),
+                    'timeZone' => 'America/Sao_Paulo',
+                ],
 
-            'end' => [
-                'dateTime' => $end->format(DATE_RFC3339),
-                'timeZone' => 'America/Sao_Paulo',
-            ],
+                'end' => [
+                    'dateTime' => $end->format(DATE_RFC3339),
+                    'timeZone' => 'America/Sao_Paulo',
+                ],
 
-            'conferenceData' => [
-                'createRequest' => [
-                    'requestId' => (string) Str::uuid(),
+                'conferenceData' => [
+                    'createRequest' => [
+                        'requestId' => (string) Str::uuid(),
 
-                    'conferenceSolutionKey' => [
-                        'type' => 'hangoutsMeet',
+                        'conferenceSolutionKey' => [
+                            'type' => 'hangoutsMeet',
+                        ],
                     ],
                 ],
-            ],
-        ]);
+            ]);
 
-        return $calendar->events->insert(
-            calendarId: 'primary',
-            postBody: $event,
-            optParams: [
-                'conferenceDataVersion' => 1,
-            ]
-        );
+            return $calendar->events->insert(
+                calendarId: 'primary',
+                postBody: $event,
+                optParams: [
+                    'conferenceDataVersion' => 1,
+                ]
+            );
+        } catch (Throwable $e) {
+            Log::error('Não foi possível criar a chamada no meet', [
+                'exception' => $e
+            ]);
+
+            return null;
+        }
     }
 
     /**
@@ -87,44 +101,52 @@ class GoogleCalendarService
         string $name,
         Carbon $start,
         Carbon $end
-    ): Event
+    ): ?Event
     {
-        $client = $this->authenticatedClient($googleAccount);
+        try {
+            $client = $this->authenticatedClient($googleAccount);
 
-        $calendar = new Calendar($client);
+            $calendar = new Calendar($client);
 
-        $event = new Event([
-            'summary' => $name,
+            $event = new Event([
+                'summary' => $name,
 
-            'start' => [
-                'dateTime' => $start->format(DATE_RFC3339),
-                'timeZone' => 'America/Sao_Paulo',
-            ],
+                'start' => [
+                    'dateTime' => $start->format(DATE_RFC3339),
+                    'timeZone' => 'America/Sao_Paulo',
+                ],
 
-            'end' => [
-                'dateTime' => $end->format(DATE_RFC3339),
-                'timeZone' => 'America/Sao_Paulo',
-            ],
+                'end' => [
+                    'dateTime' => $end->format(DATE_RFC3339),
+                    'timeZone' => 'America/Sao_Paulo',
+                ],
 
-            'conferenceData' => [
-                'createRequest' => [
-                    'requestId' => (string) Str::uuid(),
+                'conferenceData' => [
+                    'createRequest' => [
+                        'requestId' => (string) Str::uuid(),
 
-                    'conferenceSolutionKey' => [
-                        'type' => 'hangoutsMeet',
+                        'conferenceSolutionKey' => [
+                            'type' => 'hangoutsMeet',
+                        ],
                     ],
                 ],
-            ],
-        ]);
+            ]);
 
-        return $calendar->events->patch(
-            calendarId: 'primary',
-            eventId: $eventId,
-            postBody: $event,
-            optParams: [
-                'conferenceDataVersion' => 1,
-            ]
-        );
+            return $calendar->events->patch(
+                calendarId: 'primary',
+                eventId: $eventId,
+                postBody: $event,
+                optParams: [
+                    'conferenceDataVersion' => 1,
+                ]
+            );
+        } catch (Throwable $e) {
+            Log::error('Não foi possível criar a chamada no meet', [
+                'exception' => $e
+            ]);
+
+            return null;
+        }
     }
 
     /**
@@ -135,14 +157,20 @@ class GoogleCalendarService
         GoogleAccount $googleAccount,
     ): void
     {
-        $client = $this->authenticatedClient($googleAccount);
+        try {
+            $client = $this->authenticatedClient($googleAccount);
 
-        $calendar = new Calendar($client);
+            $calendar = new Calendar($client);
 
-        $calendar->events->delete(
-            calendarId: 'primary',
-            eventId: $eventId,
-        );
+            $calendar->events->delete(
+                calendarId: 'primary',
+                eventId: $eventId,
+            );
+        } catch (Throwable $e) {
+            Log::error('Não foi possível remover a chamada no meet', [
+                'exception' => $e
+            ]);
+        }
     }
 
     public function authenticatedClient(GoogleAccount $googleAccount): Client
