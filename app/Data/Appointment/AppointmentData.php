@@ -52,6 +52,24 @@ class AppointmentData extends Data
 
     public static function rules(ValidationContext $context): array
     {
+        $dateUnchanged = false;
+        $appointmentUuid = $context->payload['uuid'] ?? null;
+        $incomingDate = $context->payload['date'] ?? null;
+
+        if (request()->routeIs('appointment.update') && is_string($appointmentUuid) && is_string($incomingDate)) {
+            $appointment = Appointment::query()->where('uuid', $appointmentUuid)->first();
+
+            if ($appointment) {
+                try {
+                    $dateUnchanged = $appointment->date->equalTo(
+                        Carbon::parse($incomingDate, config('app.timezone'))
+                    );
+                } catch (\Exception) {
+                    // A regra date rejeita valores invalidos.
+                }
+            }
+        }
+
         return [
             'patient' => [
                 'required',
@@ -59,7 +77,7 @@ class AppointmentData extends Data
             'date' => [
                 'required',
                 'date',
-                'after_or_equal:today'
+                Rule::when(!$dateUnchanged, ['after_or_equal:today']),
             ],
             'presence' => [
                 'required',

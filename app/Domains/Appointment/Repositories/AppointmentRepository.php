@@ -7,6 +7,7 @@ use App\Data\Appointment\IndexAppointmentData;
 use App\Domains\Appointment\Entities\Appointment;
 use App\Domains\Appointment\Entities\Contract;
 use App\Domains\Patient\Entities\Patient;
+use App\Enums\PresenceEnum;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -24,6 +25,17 @@ class AppointmentRepository
             ->with(['patient:id,uuid,name,time,type'])
             ->where('uuid', $uuid)
             ->firstOrFail();
+    }
+
+    public function getLastByPatient(string $patientUuid, bool $checkForCreate = false): ?Appointment
+    {
+        return $this->appointment::query()
+            ->whereHas('patient', fn(Builder $query) => $query->where('uuid', $patientUuid))
+            ->when($checkForCreate, fn (Builder $query) =>
+                $query->whereIn('presence', PresenceEnum::statusForCreateNewAppointmentAutomatically())
+            )
+            ->orderByDesc('id')
+            ->first();
     }
 
     public function getAll(IndexAppointmentData $filters): Collection
@@ -61,6 +73,12 @@ class AppointmentRepository
         $appointment->save();
 
         return $appointment;
+    }
+
+    public function firstOrCreate(array $conditions, AppointmentData $appointmentData): Appointment
+    {
+        return $this->appointment->newQuery()->where($conditions)->first()
+            ?? $this->create($appointmentData);
     }
 
     public function update(AppointmentData $appointmentData): bool

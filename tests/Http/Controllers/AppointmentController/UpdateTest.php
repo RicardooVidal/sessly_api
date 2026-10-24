@@ -161,6 +161,55 @@ class UpdateTest extends TestCase
             ]);
     }
 
+    #[Test, TestDox('Deve aceitar data passada apenas quando permanecer inalterada para a consulta')]
+    #[DataProvider('datasDeConsultaPassadaDataProvider')]
+    public function deveValidarAlteracaoDeDataPassada(string $dateChange, bool $shouldSucceed): void
+    {
+        $this->login();
+
+        $originalDate = now()->subDays(5)->setTime(9, 0);
+        $appointment = Appointment::factory()->withPatient()->create([
+            'date' => $originalDate,
+        ]);
+
+        $date = match ($dateChange) {
+            'unchanged' => $originalDate->copy(),
+            'timezone' => $originalDate->copy()->setTimezone('UTC'),
+            'day' => $originalDate->copy()->subDay(),
+            'time' => $originalDate->copy()->addHour(),
+            'invalid' => null,
+        };
+
+        $response = $this->putJson($this->rota(), [
+            'uuid' => $appointment->uuid,
+            'date' => $date?->toW3cString() ?? 'invalid-date',
+            'patient' => ['uuid' => $appointment->patient->uuid],
+            'presence' => PresenceEnum::PRESENT->value,
+            'value' => '35.50',
+            'notes' => 'Presenca atualizada',
+        ]);
+
+        if ($shouldSucceed) {
+            $response->assertOk();
+            $this->assertTrue($appointment->fresh()->date->equalTo($originalDate));
+            $this->assertSame(PresenceEnum::PRESENT, $appointment->fresh()->presence);
+        } else {
+            $response->assertUnprocessable()->assertJsonValidationErrors('date');
+            $this->assertTrue($appointment->fresh()->date->equalTo($originalDate));
+        }
+    }
+
+    public static function datasDeConsultaPassadaDataProvider(): array
+    {
+        return [
+            'data inalterada' => ['unchanged', true],
+            'mesmo instante em outro timezone' => ['timezone', true],
+            'outro dia passado' => ['day', false],
+            'outro horario passado' => ['time', false],
+            'data invalida' => ['invalid', false],
+        ];
+    }
+
     public static function parametrosInvalidosDataProvider(): array
     {
         return [
