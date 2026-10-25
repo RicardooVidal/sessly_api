@@ -2,13 +2,9 @@
 
 namespace Http\Controllers\ContractController;
 
-use App\Data\Contract\ContractData;
 use App\Domains\Contract\Entities\Contract;
-use App\Domains\Patient\Entities\Patient;
 use App\Http\Controllers\ContractController;
-use App\Http\Controllers\PatientController;
 use Illuminate\Support\Facades\URL;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestDox;
 use Tests\TestCase;
@@ -56,7 +52,11 @@ class ShowTest extends TestCase
                         'time' => null,
                         'document' => null,
                         'active' => null,
+                        'create_appointments' => null,
+                        'day' => null,
+                        'notify_appointment' => null,
                         'notes' => null,
+                        'value' => null,
                     ],
                     'description' => $contract->description,
                     'valid_until' => $contract->valid_until->toW3cString(),
@@ -64,7 +64,7 @@ class ShowTest extends TestCase
                     'created_at' => $contract->created_at->toW3cString(),
                     'updated_at' => $contract->updated_at->toW3cString(),
                     'file' => null,
-                ]
+                ],
             ])
             ->assertJsonStructure([
                 'data' => [
@@ -75,7 +75,7 @@ class ShowTest extends TestCase
                     'document_url',
                     'created_at',
                     'updated_at',
-                ]
+                ],
             ]);
     }
 

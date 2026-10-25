@@ -2,11 +2,8 @@
 
 namespace App\Domains\Appointment\Entities;
 
-use App\Domains\Appointment\Enums\AppointmentTimeEnum;
-use App\Domains\Appointment\Enums\AppointmentTypeEnum;
 use App\Domains\Patient\Entities\Patient;
 use App\Enums\PresenceEnum;
-use App\Events\AppointmentCreatedEvent;
 use App\Models\Traits\HasUuid;
 use Carbon\Carbon;
 use Database\Factories\AppointmentFactory;
@@ -25,7 +22,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string|null $notes
  * @property string|null $google_event_id
  * @property string|null $google_meet_url
- *
  * @property-read Patient $patient
  *
  * @method static AppointmentFactory factory($count = null, $state = [])
