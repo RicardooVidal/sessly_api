@@ -107,7 +107,7 @@ class PhpWordService
      */
     public function convertToDocx(string $uuid, string $medicalRecordEncrypted): string
     {
-        $html = base64_decode($medicalRecordEncrypted);
+        $html = $this->normalizeVoidElements(base64_decode($medicalRecordEncrypted));
 
         $phpWord = new PhpWord();
 
@@ -132,6 +132,15 @@ class PhpWordService
         unlink($tempFile);
 
         return "medical_records/$uuid.docx";
+    }
+
+    private function normalizeVoidElements(string $html): string
+    {
+        return preg_replace_callback(
+            '/<(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)((?:\s[^<>]*?)?)\s*\/?>/i',
+            static fn (array $matches): string => sprintf('<%s%s />', $matches[1], rtrim($matches[2] ?? '')),
+            $html
+        );
     }
 
     public function getContent(): ?string
