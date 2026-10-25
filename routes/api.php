@@ -3,6 +3,7 @@
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ContractController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\GoogleCalendarController;
 use App\Http\Controllers\MedicalRecordController;
@@ -66,4 +67,7 @@ Route::middleware([CheckSchema::class, 'auth:sanctum'])->group(function () {
 
     Route::get('/finance/summary', [FinanceController::class, 'summary'])
         ->name('finance.summary');
+
+    Route::get('/dashboard/summary', [DashboardController::class, 'summary'])
+        ->name('dashboard.summary');
 });

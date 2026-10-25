@@ -4,11 +4,8 @@ namespace Http\Controllers\WaitListController;
 
 use App\Domains\Patient\Entities\Patient;
 use App\Domains\Patient\Entities\WaitList;
-use App\Http\Controllers\PatientController;
 use App\Http\Controllers\WaitListController;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\URL;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestDox;
 use Tests\TestCase;
