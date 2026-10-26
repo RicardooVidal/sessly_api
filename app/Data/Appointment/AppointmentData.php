@@ -115,6 +115,7 @@ class AppointmentData extends Data
             'patient.required' => 'O paciente é obrigatório.',
             'date.after_or_equal' => 'A data da consulta deve ser hoje ou uma data futura.',
             'presence.required' => 'O tipo de presença é obrigatório.',
+            'value.decimal' => 'O valor deve ter duas casas decimais',
             'value.min' => 'O valor deve ser no mínimo 0'
         ];
     }

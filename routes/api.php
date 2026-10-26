@@ -51,7 +51,8 @@ Route::middleware([CheckSchema::class, 'auth:sanctum'])->group(function () {
         Route::put('/', [PatientController::class, 'update'])->name('update');
     });
 
-    Route::resources(['wait-list' => WaitListController::class]);
+    Route::resource('wait-list', WaitListController::class)
+        ->only(['index', 'store', 'destroy']);
     Route::resource('contract', ContractController::class)->except(['update']);
     //        Route::put('contract', [ContractController::class, 'update'])->name('contract.update');
 

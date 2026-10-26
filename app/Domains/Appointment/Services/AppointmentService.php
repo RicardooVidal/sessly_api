@@ -78,6 +78,8 @@ class AppointmentService
 
         $googleAccount = $this->getGoogleAccount();
 
+        $event = null;
+
         if ($googleAccount && $appointment->google_event_id) {
             $event = $this->googleCalendarService->updateMeeting(
                 eventId: $appointment->google_event_id,
@@ -86,13 +88,20 @@ class AppointmentService
                 start: $appointment->date,
                 end: $appointment->date->addMinutes($appointment->patient->time->value),
             );
+        } else {
+            $event = $this->googleCalendarService->createMeeting(
+                googleAccount: $googleAccount,
+                name: "{$appointment->patient->name} - {$appointment->date->format('d/m/Y H:i')}",
+                start: $appointment->date,
+                end: $appointment->date->addMinutes($appointment->patient->time->value),
+            );
+        }
 
-            if ($event) {
-                $appointment->update([
-                    'google_event_id' => $event->getId(),
-                    'google_meet_url' => $event->getHangoutLink(),
-                ]);
-            }
+        if ($event) {
+            $appointment->update([
+                'google_event_id' => $event->getId(),
+                'google_meet_url' => $event->getHangoutLink(),
+            ]);
         }
 
         $this->checkMedicalRecord($appointmentData, $appointment);

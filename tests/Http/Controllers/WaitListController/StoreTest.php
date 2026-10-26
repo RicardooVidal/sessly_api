@@ -48,6 +48,44 @@ class StoreTest extends TestCase
         ]);
     }
 
+    #[Test, TestDox('Deve retornar erro ao tentar cadastrar um paciente já presente na lista de espera')]
+    public function erroPacienteDuplicado(): void
+    {
+        $paciente = $this->criarPaciente();
+
+        $this->login();
+
+        $this
+            ->postJson($this->rota(), ['patient_uuid' => $paciente->uuid])
+            ->assertCreated();
+
+        $this
+            ->postJson($this->rota(), ['patient_uuid' => $paciente->uuid])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['patient_uuid']);
+
+        $this->assertDatabaseCount(WaitList::class, 1);
+    }
+
+    #[Test, TestDox('Deve permitir cadastrar novamente um paciente removido da lista de espera')]
+    public function sucessoAposRemocao(): void
+    {
+        $paciente = $this->criarPaciente();
+
+        WaitList::factory()
+            ->withPatient($paciente)
+            ->create()
+            ->delete();
+
+        $this->login();
+
+        $this
+            ->postJson($this->rota(), ['patient_uuid' => $paciente->uuid])
+            ->assertCreated();
+
+        $this->assertDatabaseCount(WaitList::class, 2);
+    }
+
     #[Test, TestDox('Deve retornar erro ao tentar cadastrar paciente inexistente na lista de espera')]
     public function erroPacienteInexistente(): void
     {
