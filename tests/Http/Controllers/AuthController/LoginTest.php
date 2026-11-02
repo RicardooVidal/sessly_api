@@ -22,8 +22,8 @@ class LoginTest extends TestCase
             'email' => $user->email,
             'password' => 'password',
         ])
-        ->assertOk()
-        ->assertJsonStructure(['token']);
+            ->assertOk()
+            ->assertJsonStructure(['data' => ['token']]);
     }
 
     #[Test, TestDox('Não deve logar com dados inválidos')]
@@ -33,7 +33,7 @@ class LoginTest extends TestCase
             'email' => $this->faker->word,
             'password' => $this->faker->boolean,
         ])
-        ->assertUnprocessable();
+            ->assertUnprocessable();
     }
 
     #[Test, TestDox('Não deve logar com credenciais inválidas')]
@@ -43,6 +43,6 @@ class LoginTest extends TestCase
             'email' => $this->faker->email,
             'password' => 'password',
         ])
-        ->assertUnauthorized();
+            ->assertUnauthorized();
     }
 }

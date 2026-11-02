@@ -35,7 +35,7 @@ class ImportTest extends TestCase
         $path = tempnam(sys_get_temp_dir(), 'record_test_');
 
         try {
-            $word = new PhpWord();
+            $word = new PhpWord;
             $word->addSection()->addText('Evolução clínica de João');
             IOFactory::createWriter($word, 'Word2007')->save($path);
 
@@ -45,9 +45,9 @@ class ImportTest extends TestCase
             $response = $this->postJson($this->rota(), ['file' => $file])
                 ->assertOk();
 
-            $this->assertStringContainsString('Evolução clínica de João', html_entity_decode($response->json('content')));
-            $this->assertStringNotContainsString('<body', $response->json('content'));
-            $this->assertStringNotContainsString('<html', $response->json('content'));
+            $this->assertStringContainsString('Evolução clínica de João', html_entity_decode($response->json('data.content')));
+            $this->assertStringNotContainsString('<body', $response->json('data.content'));
+            $this->assertStringNotContainsString('<html', $response->json('data.content'));
         } finally {
             if (file_exists($path)) {
                 unlink($path);
@@ -77,10 +77,10 @@ class ImportTest extends TestCase
                 ['file' => null],
             ],
             'formato inválido' => [
-                ['file' => fn() => UploadedFile::fake()->create('record.pdf', 10, 'application/pdf')],
+                ['file' => fn () => UploadedFile::fake()->create('record.pdf', 10, 'application/pdf')],
             ],
             'arquivo acima de 10 MB' => [
-                ['file' => fn() => UploadedFile::fake()->create('record.docx', 10241, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')],
+                ['file' => fn () => UploadedFile::fake()->create('record.docx', 10241, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')],
             ],
         ];
     }

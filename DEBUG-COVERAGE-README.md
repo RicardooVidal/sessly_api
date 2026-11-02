@@ -51,12 +51,12 @@ php -d pcov.enabled=1 vendor/bin/phpunit --coverage-html=coverage-report --cover
 
 ### Build da imagem
 ```bash
-docker build -f Dockerfile.local -t mindease-api .
+docker build -f Dockerfile.local -t sessly-api .
 ```
 
 ### Executar container
 ```bash
-docker run -p 8882:8882 -p 9003:9003 mindease-api
+docker run -p 8882:8882 -p 9003:9003 sessly-api
 ```
 
 ## Troubleshooting

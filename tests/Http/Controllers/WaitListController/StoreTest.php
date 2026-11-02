@@ -39,9 +39,7 @@ class StoreTest extends TestCase
         $this
             ->postJson($this->rota(), ['patient_uuid' => $paciente->uuid])
             ->assertCreated()
-            ->assertJsonFragment([
-                'patient_uuid' => $paciente->uuid,
-            ]);
+            ->assertJsonPath('data.patient_uuid', $paciente->uuid);
 
         $this->assertDatabaseHas(WaitList::class, [
             'patient_id' => $paciente->id,

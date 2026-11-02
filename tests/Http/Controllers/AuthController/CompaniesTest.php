@@ -3,7 +3,7 @@
 namespace Http\Controllers\AuthController;
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\AppointmentController;
+use App\Models\Company;
 use App\Models\User;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\URL;
@@ -34,26 +34,35 @@ class CompaniesTest extends TestCase
     #[Test, TestDox('Deve retornar somente empresas no qual o usuário pertence')]
     public function sucesso(): void
     {
+        $otherCompany = Company::factory()->create();
         $user = User::factory()->withCompany()->create();
 
         $this->actingAs($user)
             ->getJson($this->rota($user->uuid))
             ->assertOk()
-            ->assertJsonFragments([
-                'data' => [
-                    [
-                        'uuid' => $user->company->uuid,
-                        'company' => $user->company->name,
-                    ]
-                ]
-            ])
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.uuid', $user->company->uuid)
+            ->assertJsonMissing(['uuid' => $otherCompany->uuid])
             ->assertJsonStructure([
                 'data' => [
                     [
                         'uuid',
                         'company',
-                    ]
-                ]
+                    ],
+                ],
             ]);
+    }
+
+    #[Test, TestDox('Deve retornar todas as empresas para o root')]
+    public function rootDeveRetornarTodasEmpresas(): void
+    {
+        Company::factory()->create();
+
+        $root = User::query()->findOrFail(1);
+
+        $this->actingAs($root)
+            ->getJson($this->rota($root->uuid))
+            ->assertOk()
+            ->assertJsonCount(Company::query()->count(), 'data');
     }
 }

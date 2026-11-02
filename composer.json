@@ -1,7 +1,7 @@
 {
-    "name": "mindease/mindease",
+    "name": "sessly/api",
     "type": "project",
-    "description": "Api do projeto MindEase",
+    "description": "Api do projeto Sessly",
     "keywords": ["laravel", "framework"],
     "license": "MIT",
     "require": {

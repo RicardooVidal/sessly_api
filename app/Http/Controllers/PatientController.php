@@ -8,8 +8,9 @@ use App\Data\SelectData;
 use App\Data\SelectDataCollection;
 use App\Domains\Patient\Services\PatientService;
 use Illuminate\Http\JsonResponse;
-use Tests\Http\Controllers\PatientController\IndexTest;
+use Illuminate\Http\Response;
 use Tests\Http\Controllers\PatientController\GetOptionsForAppointmentTest;
+use Tests\Http\Controllers\PatientController\IndexTest;
 
 class PatientController extends Controller
 {
@@ -34,7 +35,7 @@ class PatientController extends Controller
         return (new SelectDataCollection(SelectData::class, $data))->wrap('data');
     }
 
-   public function store(PatientData $request): PatientData
+    public function store(PatientData $request): PatientData
     {
         return $this->patientService->create($request)->wrap('data');
     }
@@ -51,9 +52,11 @@ class PatientController extends Controller
         return $this->show($request->uuid);
     }
 
-    public function destroy(string $uuid): void
+    public function destroy(string $uuid): Response
     {
         $this->patientService->delete($uuid);
+
+        return response()->noContent();
     }
 
     /**

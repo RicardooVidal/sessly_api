@@ -40,7 +40,7 @@ class ShowTest extends TestCase
 
         $this->getJson($this->rota($patient->uuid))
             ->assertOk()
-            ->assertExactJson(['content' => base64_encode($html)]);
+            ->assertExactJson(['data' => ['content' => base64_encode($html)]]);
     }
 
     #[Test, TestDox('Deve retornar nulo quando o paciente não possui prontuário')]
@@ -53,7 +53,7 @@ class ShowTest extends TestCase
 
         $this->getJson($this->rota($patient->uuid))
             ->assertOk()
-            ->assertExactJson(['content' => null]);
+            ->assertExactJson(['data' => ['content' => null]]);
     }
 
     #[Test, TestDox('Não deve exibir prontuário sem estar logado')]

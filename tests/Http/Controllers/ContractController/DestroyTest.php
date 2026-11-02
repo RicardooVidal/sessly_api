@@ -3,11 +3,8 @@
 namespace Http\Controllers\ContractController;
 
 use App\Domains\Contract\Entities\Contract;
-use App\Domains\Patient\Entities\Patient;
 use App\Http\Controllers\ContractController;
-use App\Http\Controllers\PatientController;
 use Illuminate\Support\Facades\URL;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestDox;
 use Tests\TestCase;
@@ -41,7 +38,7 @@ class DestroyTest extends TestCase
         $this->login();
 
         $this->deleteJson($this->rota($contrato->uuid))
-            ->assertOk();
+            ->assertNoContent();
     }
 
     #[

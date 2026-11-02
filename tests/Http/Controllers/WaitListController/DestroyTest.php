@@ -42,7 +42,7 @@ class DestroyTest extends TestCase
         $this->login();
 
         $this->deleteJson($this->rota($waitList->uuid))
-            ->assertOk();
+            ->assertNoContent();
 
         $this->assertSoftDeleted(WaitList::class, [
             'patient_id' => $paciente->id,

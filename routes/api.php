@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\CompanyController as AdminCompanyController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ContractController;
@@ -14,7 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/user', function (Request $request) {
-    return $request->user();
+    return response()->json(['data' => $request->user()]);
 })->middleware('auth:sanctum');
 
 Route::get(
@@ -40,6 +41,17 @@ Route::get('/companies', [AuthController::class, 'companies'])
     ->whereUuid('user')
     ->name('companies')
     ->middleware('auth:sanctum');
+
+Route::middleware(['auth:sanctum', 'root'])->prefix('admin')->group(function () {
+    Route::get('/companies', [AdminCompanyController::class, 'index'])->name('admin.companies.index');
+    Route::post('/companies', [AdminCompanyController::class, 'store'])->name('admin.companies.store');
+    Route::get('/companies/{company:uuid}', [AdminCompanyController::class, 'show'])
+        ->whereUuid('company')
+        ->name('admin.companies.show');
+    Route::put('/companies/{company:uuid}', [AdminCompanyController::class, 'update'])
+        ->whereUuid('company')
+        ->name('admin.companies.update');
+});
 
 Route::middleware([CheckSchema::class, 'auth:sanctum'])->group(function () {
     Route::resource('patient', PatientController::class)->except(['update']);

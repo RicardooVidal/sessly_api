@@ -3,15 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Data\Appointment\AppointmentData;
-use App\Data\Appointment\ImportMedicalRecordData;
 use App\Data\Appointment\IndexAppointmentData;
 use App\Domains\Appointment\Services\AppointmentService;
 use App\Domains\Patient\Entities\Patient;
 use App\Exceptions\PatientNotActiveException;
-use App\Services\PhpWordService;
 use Http\Controllers\AppointmentController\IndexTest;
 use Illuminate\Http\JsonResponse;
-use PhpOffice\PhpWord\Exception\Exception;
+use Illuminate\Http\Response;
 
 class AppointmentController extends Controller
 {
@@ -36,8 +34,8 @@ class AppointmentController extends Controller
     {
         $patient = Patient::query()->where('uuid', $request->patient->uuid)->first();
 
-        if (!$patient->active) {
-            throw new PatientNotActiveException();
+        if (! $patient->active) {
+            throw new PatientNotActiveException;
         }
 
         return $this->appointmentService->create($request, $patient)->wrap('data');
@@ -52,15 +50,17 @@ class AppointmentController extends Controller
     {
         $patient = Patient::query()->where('uuid', $request->patient->uuid)->first();
 
-        if (!$patient->active) {
-            throw new PatientNotActiveException();
+        if (! $patient->active) {
+            throw new PatientNotActiveException;
         }
 
         return $this->appointmentService->update($request, $patient)->wrap('data');
     }
 
-    public function destroy(string $uuid): void
+    public function destroy(string $uuid): Response
     {
         $this->appointmentService->delete($uuid);
+
+        return response()->noContent();
     }
 }

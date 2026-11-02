@@ -30,10 +30,16 @@ class TenantMigrations extends Command
      */
     public function handle(): int
     {
-        $schemaName = $this->argument('company');
+        $schemaName = (string) $this->argument('company');
+
+        if (! preg_match('/^[a-z][a-z0-9_]{0,62}$/', $schemaName)) {
+            $this->error('The schema name must start with a lowercase letter and contain only lowercase letters, numbers and underscores (max 63 characters).');
+
+            return self::FAILURE;
+        }
 
         if ($this->option('step') !== null &&
-            (!$this->option('rollback') || !ctype_digit($this->option('step')) || (int) $this->option('step') < 1)) {
+            (! $this->option('rollback') || ! ctype_digit($this->option('step')) || (int) $this->option('step') < 1)) {
             $this->error('The --step option requires --rollback and a positive integer.');
 
             return self::FAILURE;
@@ -65,7 +71,13 @@ class TenantMigrations extends Command
 
         $this->createMigrationsTableIfNotExists();
 
-        $this->runTenantMigrations();
+        $exitCode = $this->runTenantMigrations();
+
+        if ($exitCode !== self::SUCCESS) {
+            $this->error("Failed to execute migrations for schema: {$schemaName}");
+
+            return $exitCode;
+        }
 
         $this->info("Migrations executed successfully for schema: {$schemaName}");
 
@@ -74,7 +86,8 @@ class TenantMigrations extends Command
 
     protected function createSchemaIfNotExists(string $schemaName): void
     {
-        $query = "CREATE SCHEMA IF NOT EXISTS {$schemaName}";
+        $quotedSchema = '"'.str_replace('"', '""', $schemaName).'"';
+        $query = "CREATE SCHEMA IF NOT EXISTS {$quotedSchema}";
         DB::statement($query);
 
         DatabaseHelper::changeSchema(schema: $schemaName);
@@ -82,24 +95,25 @@ class TenantMigrations extends Command
         $this->info("Schema {$schemaName} checked successfully.");
     }
 
-    protected function runTenantMigrations(): void
+    protected function runTenantMigrations(): int
     {
-        Artisan::call('migrate', [
+        $exitCode = Artisan::call('migrate', [
             '--path' => 'database/migrations/tenant',
             '--force' => true,  // Run migrations without asking for confirmation
         ]);
 
         $this->info(Artisan::output());
+
+        return $exitCode;
     }
 
     protected function createMigrationsTableIfNotExists(): void
     {
         $tableExists = DB::select("SELECT to_regclass('migrations') AS exists");
 
-        if (empty($tableExists) || !$tableExists[0]->exists) {
+        if (empty($tableExists) || ! $tableExists[0]->exists) {
             Artisan::call('migrate:install');
             $this->info('Migrations table created successfully.');
         }
     }
-
 }

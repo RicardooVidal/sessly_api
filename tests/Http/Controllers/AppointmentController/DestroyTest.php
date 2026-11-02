@@ -3,13 +3,9 @@
 namespace Tests\Http\Controllers\AppointmentController;
 
 use App\Domains\Appointment\Entities\Appointment;
-use App\Domains\Appointment\Enums\AppointmentTimeEnum;
-use App\Domains\Appointment\Enums\AppointmentTypeEnum;
-use App\Domains\Patient\Entities\Patient;
 use App\Http\Controllers\AppointmentController;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\URL;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestDox;
 use Tests\TestCase;
@@ -53,7 +49,7 @@ class DestroyTest extends TestCase
 
         $response = $this
             ->deleteJson($this->rota($appointment->uuid))
-            ->assertOk();
+            ->assertNoContent();
 
         $this->assertSoftDeleted(
             'appointments',

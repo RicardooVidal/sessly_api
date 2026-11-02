@@ -30,10 +30,11 @@ class GoogleCalendarController extends Controller
         $client->setState($state);
 
         return response()->json([
-            'url' => $client->createAuthUrl(),
+            'data' => [
+                'url' => $client->createAuthUrl(),
+            ],
         ]);
     }
-
 
     public function redirect(GoogleCalendarService $google): RedirectResponse
     {
@@ -66,7 +67,7 @@ class GoogleCalendarController extends Controller
 
         $user = $state->user;
 
-        if (!empty($token['refresh_token'])) {
+        if (! empty($token['refresh_token'])) {
             GoogleAccount::updateOrCreate(
                 [
                     'user_id' => $user->id,
@@ -117,10 +118,12 @@ class GoogleCalendarController extends Controller
         );
 
         return response()->json([
-            'google_event_id' => $event->getId(),
-            'calendar_url' => $event->getHtmlLink(),
-            'meet_url' => $event->getHangoutLink(),
-            'conference_data' => $event->getConferenceData(),
+            'data' => [
+                'google_event_id' => $event->getId(),
+                'calendar_url' => $event->getHtmlLink(),
+                'meet_url' => $event->getHangoutLink(),
+                'conference_data' => $event->getConferenceData(),
+            ],
         ]);
     }
 
@@ -138,8 +141,10 @@ class GoogleCalendarController extends Controller
         );
 
         return response()->json([
-            'event_id' => $event->getId(),
-            'meet_url' => $event->getHangoutLink(),
+            'data' => [
+                'event_id' => $event->getId(),
+                'meet_url' => $event->getHangoutLink(),
+            ],
         ]);
     }
 }

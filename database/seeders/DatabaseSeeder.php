@@ -35,7 +35,5 @@ class DatabaseSeeder extends Seeder
                 'company_id' => 1
             ]);
         }
-        DatabaseHelper::changeSchema(schema: 'ricardorodriguesvidal');
-        Patient::factory()->count(200)->create();
     }
 }

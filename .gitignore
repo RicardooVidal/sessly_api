@@ -4,6 +4,8 @@
 /public/hot
 /public/storage
 /storage/*.key
+/public/database/factories
+/public/database/seeders
 /vendor
 .env
 .env.backup

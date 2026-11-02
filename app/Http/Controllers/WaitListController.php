@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Data\WaitList\WaitListData;
 use App\Domains\Patient\Services\WaitListService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 
 class WaitListController extends Controller
 {
@@ -19,11 +20,13 @@ class WaitListController extends Controller
 
     public function store(WaitListData $request): WaitListData
     {
-        return $this->waitListService->create($request);
+        return $this->waitListService->create($request)->wrap('data');
     }
 
-    public function destroy(string $uuid): void
+    public function destroy(string $uuid): Response
     {
         $this->waitListService->delete($uuid);
+
+        return response()->noContent();
     }
 }

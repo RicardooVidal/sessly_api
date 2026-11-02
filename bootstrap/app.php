@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Middleware\CheckSchema;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -15,6 +14,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->append(HandlePrecognitiveRequests::class);
+        $middleware->alias([
+            'root' => \App\Http\Middleware\EnsureUserIsRoot::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
