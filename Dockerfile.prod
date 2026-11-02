@@ -36,6 +36,8 @@ COPY . .
 
 # Preparar diretórios do Laravel
 RUN mkdir -p \
+        storage/app/public \
+        storage/app/private \
         storage/framework/cache \
         storage/framework/sessions \
         storage/framework/views \
