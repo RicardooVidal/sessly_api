@@ -7,9 +7,10 @@
 /public/database/factories
 /public/database/seeders
 /vendor
+.git
 .env
-.env.backup
-.env.production
+.env.*
+! .env.example
 .phpactor.json
 .phpunit.result.cache
 Homestead.json
