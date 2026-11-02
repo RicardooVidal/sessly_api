@@ -4,6 +4,7 @@ namespace App\Domains\Patient\Repositories;
 
 use App\Data\Patient\IndexPatientData;
 use App\Data\Patient\PatientData;
+use App\Domains\Patient\Entities\MedicalRecord;
 use App\Domains\Patient\Entities\Patient;
 use App\Helpers\DocumentHelper;
 use App\Scopes\PatientScope;
@@ -55,5 +56,16 @@ class PatientRepository
     public function delete(string $uuid): void
     {
         $this->patient->where('uuid', $uuid)->firstOrFail()?->delete();
+    }
+
+    public function getOptionsForAppointment(string $uuid): ?Patient
+    {
+        return $this->patient->query()
+            ->where('uuid', $uuid)
+            ->select([
+                'uuid',
+                'day',
+                'value'
+            ])->firstOrFail();
     }
 }

@@ -12,9 +12,16 @@ class DatabaseHelper
     {
         $driver = DB::connection()->getDriverName();
 
-        if ($driver === 'sqlite' || (!$companyUuid && $schema === 'public')) {
+        if ($driver === 'sqlite') {
             return;
         }
+
+        if ($schema === 'public' && !$companyUuid) {
+            DB::statement('SET search_path TO "public"');
+            return;
+        }
+
+        DB::statement('SET search_path TO "public"');
 
         $company = Company::query()
             ->select(['uuid', 'company'])

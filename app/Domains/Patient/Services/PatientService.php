@@ -4,14 +4,12 @@ namespace App\Domains\Patient\Services;
 
 use App\Data\Patient\IndexPatientData;
 use App\Data\Patient\PatientData;
-use App\Domains\Patient\DTO\Requests\PatientParamsDTO;
-use App\Domains\Patient\Entities\Patient;
 use App\Domains\Patient\Repositories\PatientRepository;
 
 class PatientService
 {
     public function __construct(
-        private readonly PatientRepository $patientRepository
+        private readonly PatientRepository $patientRepository,
     ) {}
 
     public function getAll(IndexPatientData $filters): array
@@ -45,5 +43,10 @@ class PatientService
     public function delete(string $uuid): void
     {
         $this->patientRepository->delete($uuid);
+    }
+
+    public function getOptionsForAppointment(string $uuid): PatientData
+    {
+        return PatientData::from($this->patientRepository->getOptionsForAppointment($uuid));
     }
 }

@@ -4,11 +4,8 @@ namespace Http\Controllers\WaitListController;
 
 use App\Domains\Patient\Entities\Patient;
 use App\Domains\Patient\Entities\WaitList;
-use App\Http\Controllers\PatientController;
 use App\Http\Controllers\WaitListController;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\URL;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestDox;
 use Tests\TestCase;
@@ -42,13 +39,49 @@ class StoreTest extends TestCase
         $this
             ->postJson($this->rota(), ['patient_uuid' => $paciente->uuid])
             ->assertCreated()
-            ->assertJsonFragment([
-                'patient_uuid' => $paciente->uuid,
-            ]);
+            ->assertJsonPath('data.patient_uuid', $paciente->uuid);
 
         $this->assertDatabaseHas(WaitList::class, [
             'patient_id' => $paciente->id,
         ]);
+    }
+
+    #[Test, TestDox('Deve retornar erro ao tentar cadastrar um paciente já presente na lista de espera')]
+    public function erroPacienteDuplicado(): void
+    {
+        $paciente = $this->criarPaciente();
+
+        $this->login();
+
+        $this
+            ->postJson($this->rota(), ['patient_uuid' => $paciente->uuid])
+            ->assertCreated();
+
+        $this
+            ->postJson($this->rota(), ['patient_uuid' => $paciente->uuid])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['patient_uuid']);
+
+        $this->assertDatabaseCount(WaitList::class, 1);
+    }
+
+    #[Test, TestDox('Deve permitir cadastrar novamente um paciente removido da lista de espera')]
+    public function sucessoAposRemocao(): void
+    {
+        $paciente = $this->criarPaciente();
+
+        WaitList::factory()
+            ->withPatient($paciente)
+            ->create()
+            ->delete();
+
+        $this->login();
+
+        $this
+            ->postJson($this->rota(), ['patient_uuid' => $paciente->uuid])
+            ->assertCreated();
+
+        $this->assertDatabaseCount(WaitList::class, 2);
     }
 
     #[Test, TestDox('Deve retornar erro ao tentar cadastrar paciente inexistente na lista de espera')]

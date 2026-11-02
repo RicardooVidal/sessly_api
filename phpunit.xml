@@ -6,8 +6,14 @@
          cacheDirectory=".phpunit.cache"
 >
     <testsuites>
+        <testsuite name="Console">
+            <directory>tests/Console</directory>
+        </testsuite>
         <testsuite name="Http">
             <directory>tests/Http</directory>
+        </testsuite>
+        <testsuite name="Services">
+            <directory>tests/Services</directory>
         </testsuite>
     </testsuites>
     <source>

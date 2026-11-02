@@ -2,18 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Data\Appointment\AppointmentData;
 use App\Data\Contract\ContractData;
 use App\Data\Contract\IndexContractData;
-use App\Domains\Contract\DTO\Requests\ContractParamsDTO;
 use App\Domains\Contract\Services\ContractService;
 use App\Domains\Patient\Entities\Patient;
-use App\Domains\Patient\Services\PatientService;
 use App\Helpers\StorageHelper;
-use App\Http\Requests\ContractRequest;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
+use Illuminate\Http\Response;
 
 ini_set('upload_max_filesize', '10M');
 ini_set('post_max_size', '10M');
@@ -48,18 +43,20 @@ class ContractController extends Controller
         return $this->contractService->getByUuid($uuid)->wrap('data');
     }
 
-//    public function update(ContractData $contract): ContractData
-//    {
-//        /** @var Patient $patient */
-//        $patient = Patient::query()->select(['id'])->where('uuid', $contract->patient->uuid)->firstOrFail();
-//
-//        $this->contractService->update($contract->except('file'), $patient);
-//
-//        return $this->show($contract->uuid);
-//    }
+    //    public function update(ContractData $contract): ContractData
+    //    {
+    //        /** @var Patient $patient */
+    //        $patient = Patient::query()->select(['id'])->where('uuid', $contract->patient->uuid)->firstOrFail();
+    //
+    //        $this->contractService->update($contract->except('file'), $patient);
+    //
+    //        return $this->show($contract->uuid);
+    //    }
 
-    public function destroy(string $uuid): void
+    public function destroy(string $uuid): Response
     {
         $this->contractService->delete($uuid);
+
+        return response()->noContent();
     }
 }

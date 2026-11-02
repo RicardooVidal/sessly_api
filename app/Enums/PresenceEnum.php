@@ -17,4 +17,12 @@ enum PresenceEnum: string
 
     #[Description('Ausente')]
     case ABSENT = 'absent';
+
+    public static function statusForCreateNewAppointmentAutomatically(): array
+    {
+        return [
+          self::PRESENT,
+          self::ABSENT,
+        ];
+    }
 }

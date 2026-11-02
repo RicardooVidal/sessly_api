@@ -63,7 +63,6 @@ class IndexTest extends TestCase
 
         $this
             ->getJson($this->rota() . '?' . http_build_query($data ? $data->toArray() : []))
-            ->ddJson()
             ->assertOk()
             ->assertJsonCount($data ? 1 : $contratos->count(), 'data')
             ->assertJsonStructure([

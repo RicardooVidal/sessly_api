@@ -29,8 +29,8 @@ class RegisterTest extends TestCase
             'password' => 'password',
             'password_confirmation' => 'password',
         ])
-        ->assertOk()
-        ->assertJsonStructure(['token']);
+            ->assertOk()
+            ->assertJsonStructure(['data' => ['token']]);
     }
 
     #[Test, TestDox('Não deve registrar com a falta da confirmação de senha')]

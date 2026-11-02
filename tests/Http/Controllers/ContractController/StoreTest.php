@@ -2,21 +2,13 @@
 
 namespace Http\Controllers\ContractController;
 
-use App\Domains\Appointment\Entities\Appointment;
-use App\Domains\Appointment\Enums\AppointmentTimeEnum;
-use App\Domains\Appointment\Enums\AppointmentTypeEnum;
 use App\Domains\Contract\Entities\Contract;
 use App\Domains\Patient\Entities\Patient;
-use App\Exceptions\PatientNotActiveException;
-use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\ContractController;
-use App\Http\Controllers\PatientController;
 use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
-use Illuminate\Validation\ValidationException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestDox;
@@ -77,16 +69,24 @@ class StoreTest extends TestCase
                     'description' => $parametros['description'],
                     'patient' => [
                         'uuid' => $patient->uuid,
-                        'first_name' => $patient->first_name,
-                        'last_name' => $patient->last_name,
+                        'name' => $patient->name,
+                        'phone' => null,
+                        'gender' => null,
+                        'email' => null,
+                        'type' => null,
+                        'time' => null,
                         'active' => null,
+                        'create_appointments' => null,
+                        'day' => null,
+                        'notify_appointment' => null,
                         'document' => null,
                         'notes' => null,
+                        'value' => null,
                     ],
                     'valid_until' => $date->toW3cString(),
                     'file' => null,
-                    'document' => 'contracts/contract_patient_' . $patient->uuid . '.pdf',
-                ]
+                    'document_url' => Storage::disk('app_files')->url('contracts/contract_patient_'.$patient->uuid.'.pdf'),
+                ],
             ]);
     }
 
@@ -99,7 +99,6 @@ class StoreTest extends TestCase
         Storage::fake('app_files');
 
         /** @var Patient $patient */
-
         $patient = Patient::factory()->create();
 
         $date = now()->addDay();
@@ -191,19 +190,19 @@ class StoreTest extends TestCase
     {
         return [
             'description inválido' => [
-                ['description' => 1]
+                ['description' => 1],
             ],
             'patient inválido' => [
-                ['patient' => null]
+                ['patient' => null],
             ],
             'valid_until inválido' => [
-                ['valid_until'=> 'invalid-date']
+                ['valid_until' => 'invalid-date'],
             ],
             'valid_until na data atual' => [
-                ['valid_until'=> now()]
+                ['valid_until' => now()],
             ],
             'file inválido' => [
-                ['file' => 'invalid-file']
+                ['file' => 'invalid-file'],
             ],
         ];
     }

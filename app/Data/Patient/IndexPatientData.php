@@ -13,7 +13,8 @@ class IndexPatientData extends Data
         public ?string $uuid = null,
         public ?string $name = null,
         public ?string $document = null,
-        public ?bool $active = null
+        public ?bool $active = null,
+        public ?bool $excludeWaitList = null
     ) {}
 
     public static function rules(): array
@@ -37,7 +38,11 @@ class IndexPatientData extends Data
             'active' => [
                 'nullable',
                 'boolean',
-            ]
+            ],
+            'exclude_wait_list' => [
+                'nullable',
+                'boolean',
+            ],
         ];
     }
 }

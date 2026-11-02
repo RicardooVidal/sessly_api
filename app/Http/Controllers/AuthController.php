@@ -5,14 +5,11 @@ namespace App\Http\Controllers;
 use App\Data\CompanyData;
 use App\Data\CompanyDataCollection;
 use App\Data\LoginData;
-use App\Exceptions\ErrorCreateUserException;
 use App\Helpers\DatabaseHelper;
 use App\Models\Company;
 use App\Models\User;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
@@ -22,7 +19,7 @@ class AuthController extends Controller
     {
         $credentials = $request->only('email', 'password')->toArray();
 
-        if (!Auth::attempt($credentials)) {
+        if (! Auth::attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
@@ -33,14 +30,19 @@ class AuthController extends Controller
         $company = $user->company()->first();
 
         $token = $user->createToken($user->name, ['*'], now()->addHour())->plainTextToken;
-        DatabaseHelper::changeSchema(schema: $company->uuid);
 
-        return response()->json(['token' => $token]);
+        if ((int) $user->id !== 1 && $company) {
+            DatabaseHelper::changeSchema(schema: $company->uuid);
+        }
+
+        return response()->json(['data' => ['token' => $token]]);
     }
 
-    public function logout(Request $request): void
+    public function logout(Request $request): Response
     {
         $request->user()->currentAccessToken()->delete();
+
+        return response()->noContent();
     }
 
     public function register(Request $request)
@@ -66,26 +68,29 @@ class AuthController extends Controller
         $user->save();
 
         if ($user) {
-            return response()->json(['token' => $user->createToken($user->name)->plainTextToken]);
+            return response()->json([
+                'data' => [
+                    'token' => $user->createToken($user->name)->plainTextToken,
+                ],
+            ]);
         }
     }
 
     public function companies(Request $request): CompanyDataCollection
     {
-        return (new CompanyDataCollection(CompanyData::class, Company::query()
+        $user = $request->user();
+
+        $companies = Company::query()
             ->select([
                 'id',
                 'uuid',
                 'name',
             ])
-            ->with('users', fn(HasMany $query) => $query
-                ->select([
-                    'id',
-                    'name',
-                ])
-                ->where('id', $request->user()->id))
+            ->when((int) $user->id !== 1, fn ($query) => $query->whereKey($user->company_id))
+            ->orderBy('name')
             ->get()
-            ->map(fn(Company $company) => ['uuid' => $company->uuid, 'company' => $company->name])
-        ))->wrap('data');
+            ->map(fn (Company $company) => ['uuid' => $company->uuid, 'company' => $company->name]);
+
+        return (new CompanyDataCollection(CompanyData::class, $companies))->wrap('data');
     }
 }

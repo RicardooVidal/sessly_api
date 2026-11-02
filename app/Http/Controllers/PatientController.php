@@ -6,14 +6,11 @@ use App\Data\Patient\IndexPatientData;
 use App\Data\Patient\PatientData;
 use App\Data\SelectData;
 use App\Data\SelectDataCollection;
-use App\Domains\Patient\DTO\Requests\PatientParamsDTO;
-use App\Domains\Patient\Entities\Patient;
 use App\Domains\Patient\Services\PatientService;
-use App\Http\Requests\PatientRequest;
-use App\Http\Requests\UpdatePatientRequest;
-use Http\Controllers\PatientController\IndexTest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
+use Tests\Http\Controllers\PatientController\GetOptionsForAppointmentTest;
+use Tests\Http\Controllers\PatientController\IndexTest;
 
 class PatientController extends Controller
 {
@@ -22,8 +19,6 @@ class PatientController extends Controller
     ) {}
 
     /**
-     * @param IndexPatientData $request
-     * @return JsonResponse
      * @see IndexTest
      */
     public function index(IndexPatientData $request): JsonResponse
@@ -40,7 +35,7 @@ class PatientController extends Controller
         return (new SelectDataCollection(SelectData::class, $data))->wrap('data');
     }
 
-   public function store(PatientData $request): PatientData
+    public function store(PatientData $request): PatientData
     {
         return $this->patientService->create($request)->wrap('data');
     }
@@ -57,8 +52,18 @@ class PatientController extends Controller
         return $this->show($request->uuid);
     }
 
-    public function destroy(string $uuid): void
+    public function destroy(string $uuid): Response
     {
         $this->patientService->delete($uuid);
+
+        return response()->noContent();
+    }
+
+    /**
+     * @see GetOptionsForAppointmentTest
+     */
+    public function getOptionsForAppointment(string $uuid): PatientData
+    {
+        return $this->patientService->getOptionsForAppointment($uuid)->wrap('data');
     }
 }

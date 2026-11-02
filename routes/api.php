@@ -1,19 +1,37 @@
 <?php
 
+use App\Http\Controllers\Admin\CompanyController as AdminCompanyController;
+use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ContractController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FinanceController;
+use App\Http\Controllers\GoogleCalendarController;
+use App\Http\Controllers\MedicalRecordController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\WaitListController;
-use App\Http\Controllers\AppointmentController;
-use App\Http\Controllers\PaymentController;
-use App\Http\Controllers\ContractController;
-use Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests;
+use App\Http\Middleware\CheckSchema;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
-use App\Http\Middleware\CheckSchema;
 
 Route::get('/user', function (Request $request) {
-    return $request->user();
+    return response()->json(['data' => $request->user()]);
 })->middleware('auth:sanctum');
+
+Route::get(
+    '/auth/google/callback',
+    [GoogleCalendarController::class, 'callback']
+);
+
+Route::middleware('auth:sanctum')->get(
+    '/google/connect',
+    [GoogleCalendarController::class, 'connect']
+);
+
+Route::middleware('auth:sanctum')->get(
+    '/google/testing',
+    [GoogleCalendarController::class, 'test']
+);
 
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')
@@ -24,21 +42,45 @@ Route::get('/companies', [AuthController::class, 'companies'])
     ->name('companies')
     ->middleware('auth:sanctum');
 
-    Route::middleware([CheckSchema::class, 'auth:sanctum'])->group(function () {
-        Route::resource('patient', PatientController::class)->except(['update']);
-        Route::group(['prefix' => 'patient', 'as' => 'patient.'], function () {
-            Route::get('/select/get', [PatientController::class, 'select'])->name('select');
-            Route::put('/', [PatientController::class, 'update'])->name('update');
-        });
+Route::middleware(['auth:sanctum', 'root'])->prefix('admin')->group(function () {
+    Route::get('/companies', [AdminCompanyController::class, 'index'])->name('admin.companies.index');
+    Route::post('/companies', [AdminCompanyController::class, 'store'])->name('admin.companies.store');
+    Route::get('/companies/{company:uuid}', [AdminCompanyController::class, 'show'])
+        ->whereUuid('company')
+        ->name('admin.companies.show');
+    Route::put('/companies/{company:uuid}', [AdminCompanyController::class, 'update'])
+        ->whereUuid('company')
+        ->name('admin.companies.update');
+});
 
-        Route::resources(['wait-list' => WaitListController::class]);
-        Route::resource('contract', ContractController::class)->except(['update']);
-//        Route::put('contract', [ContractController::class, 'update'])->name('contract.update');
+Route::middleware([CheckSchema::class, 'auth:sanctum'])->group(function () {
+    Route::resource('patient', PatientController::class)->except(['update']);
+    Route::group(['prefix' => 'patient', 'as' => 'patient.'], function () {
+        Route::get('/select/get', [PatientController::class, 'select'])->name('select');
+        Route::get('/options-appointments/get/{patient:uuid}', [PatientController::class, 'getOptionsForAppointment'])
+            ->whereUuid('uuid')
+            ->name('options-appointments');
+        Route::put('/', [PatientController::class, 'update'])->name('update');
+    });
 
-        Route::resource('appointment', AppointmentController::class)->except(['update']);
-        Route::put('appointment', [AppointmentController::class, 'update'])->name('appointment.update');
+    Route::resource('wait-list', WaitListController::class)
+        ->only(['index', 'store', 'destroy']);
+    Route::resource('contract', ContractController::class)->except(['update']);
+    //        Route::put('contract', [ContractController::class, 'update'])->name('contract.update');
 
-        Route::resources([
-            'payment' => PaymentController::class
-        ]);
+    Route::resource('appointment', AppointmentController::class)->except(['update']);
+    Route::put('appointment', [AppointmentController::class, 'update'])->name('appointment.update');
+
+    Route::get('/medical-record/get-by-patient/{uuid}', [MedicalRecordController::class, 'getMedicalRecord'])
+        ->whereUuid('uuid')
+        ->name('medical-record.get-by-patient');
+
+    Route::post('/medical-record/import', [MedicalRecordController::class, 'importMedicalRecord'])
+        ->name('medical-record.import');
+
+    Route::get('/finance/summary', [FinanceController::class, 'summary'])
+        ->name('finance.summary');
+
+    Route::get('/dashboard/summary', [DashboardController::class, 'summary'])
+        ->name('dashboard.summary');
 });

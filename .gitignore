@@ -4,10 +4,12 @@
 /public/hot
 /public/storage
 /storage/*.key
+/public/database/factories
+/public/database/seeders
 /vendor
+.git
 .env
-.env.backup
-.env.production
+!.env.example
 .phpactor.json
 .phpunit.result.cache
 Homestead.json

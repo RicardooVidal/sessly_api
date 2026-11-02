@@ -43,9 +43,13 @@ class UpdateTest extends TestCase
             'document' => $this->faker->cpf(false),
             'phone' => $this->faker->phoneNumber,
             'gender' => $this->faker->randomElement(GenderEnum::cases()),
+            'day' => 3,
             'email' => $this->faker->email,
             'active' => false,
+            'create_appointments' => true,
+            'notify_appointment' => false,
             'notes' => $this->faker->text,
+            'value' => $this->faker->randomFloat(),
             'type' => $this->faker->randomElement(AppointmentTypeEnum::cases()),
             'time' => $this->faker->randomElement(AppointmentTimeEnum::cases()),
         ];
@@ -61,9 +65,13 @@ class UpdateTest extends TestCase
                 'document' => $parametros['document'],
                 'phone' => $parametros['phone'],
                 'gender' => $parametros['gender'],
+                'day' => $parametros['day'],
                 'email' => $parametros['email'],
                 'active' => $parametros['active'],
+                'create_appointments' => $parametros['create_appointments'],
+                'notify_appointment' => $parametros['notify_appointment'],
                 'notes' => $parametros['notes'],
+                'value' => $parametros['value'],
                 'type' => $parametros['type'],
                 'time' => $parametros['time'],
             ])
@@ -73,9 +81,13 @@ class UpdateTest extends TestCase
                     'document',
                     'phone',
                     'gender',
+                    'day',
                     'email',
                     'active',
+                    'create_appointments',
+                    'notify_appointment',
                     'notes',
+                    'value',
                     'type',
                     'time',
                 ]
@@ -93,9 +105,13 @@ class UpdateTest extends TestCase
             'document' => $this->faker->cpf(false),
             'phone' => $this->faker->phoneNumber,
             'gender' => $this->faker->randomElement(GenderEnum::cases()),
+            'day' => 3,
             'email' => $this->faker->email,
             'active' => false,
+            'create_appointments' => true,
+            'notify_appointment' => false,
             'notes' => $this->faker->text,
+            'value' => $this->faker->randomFloat(),
             'type' => $this->faker->randomElement(AppointmentTypeEnum::cases()),
             'time' => $this->faker->randomElement(AppointmentTimeEnum::cases()),
         ];
@@ -136,9 +152,13 @@ class UpdateTest extends TestCase
             'document' => $this->faker->cpf(false),
             'phone' => $this->faker->phoneNumber,
             'gender' => $this->faker->randomElement(GenderEnum::cases()),
+            'day' => 3,
             'email' => $this->faker->email,
             'active' => false,
+            'create_appointments' => true,
+            'notify_appointment' => false,
             'notes' => $this->faker->text,
+            'value' => $this->faker->randomFloat(),
             'type' => $this->faker->randomElement(AppointmentTypeEnum::cases()),
             'time' => $this->faker->randomElement(AppointmentTimeEnum::cases()),
         ];
@@ -181,11 +201,23 @@ class UpdateTest extends TestCase
             'email max' => [
                 ['email' => str_repeat('a', 101)]
             ],
+            'day inválido' => [
+                ['day' => 'inválido']
+            ],
             'gender inválido' => [
                 ['gender' => 'invalido']
             ],
             'active inválido' => [
                 ['active' => 'invalido']
+            ],
+            'create_appointments inválido' => [
+                ['create_appointments' => 'teste']
+            ],
+            'notify_appointment inválido' => [
+                ['notify_appointment' => 'teste']
+            ],
+            'value inválido' => [
+                ['value' => 'inválido']
             ],
             'notes inválido' => [
                 ['notes' => true]

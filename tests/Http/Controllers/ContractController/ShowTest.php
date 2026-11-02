@@ -2,13 +2,9 @@
 
 namespace Http\Controllers\ContractController;
 
-use App\Data\Contract\ContractData;
 use App\Domains\Contract\Entities\Contract;
-use App\Domains\Patient\Entities\Patient;
 use App\Http\Controllers\ContractController;
-use App\Http\Controllers\PatientController;
 use Illuminate\Support\Facades\URL;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\Attributes\TestDox;
 use Tests\TestCase;
@@ -48,19 +44,27 @@ class ShowTest extends TestCase
                     'uuid' => $contract->uuid,
                     'patient' => [
                         'uuid' => $contract->patient->uuid,
-                        'first_name' => $contract->patient->first_name,
-                        'last_name' => $contract->patient->last_name,
+                        'name' => $contract->patient->name,
+                        'phone' => null,
+                        'gender' => null,
+                        'email' => null,
+                        'type' => null,
+                        'time' => null,
                         'document' => null,
                         'active' => null,
+                        'create_appointments' => null,
+                        'day' => null,
+                        'notify_appointment' => null,
                         'notes' => null,
+                        'value' => null,
                     ],
                     'description' => $contract->description,
                     'valid_until' => $contract->valid_until->toW3cString(),
-                    'document' => $contract->document,
+                    'document_url' => $contract->document_url,
                     'created_at' => $contract->created_at->toW3cString(),
                     'updated_at' => $contract->updated_at->toW3cString(),
                     'file' => null,
-                ]
+                ],
             ])
             ->assertJsonStructure([
                 'data' => [
@@ -68,10 +72,10 @@ class ShowTest extends TestCase
                     'patient',
                     'description',
                     'valid_until',
-                    'document',
+                    'document_url',
                     'created_at',
                     'updated_at',
-                ]
+                ],
             ]);
     }
 
