@@ -60,4 +60,4 @@ RUN chmod -R 0755 storage/
 # Expose the container port (if your app runs on a specific port)
 EXPOSE 8882
 
-CMD ["sh", "-c", "cp .env-docker .env && composer install --ignore-platform-reqs && php artisan serve --host=0.0.0.0 --port=8882"]
+CMD ["sh", "-c", "cp .env.docker .env && composer install --ignore-platform-reqs && php artisan serve --host=0.0.0.0 --port=8882"]
