@@ -74,10 +74,9 @@ class DashboardService
 
     private function periodSummary(Carbon $startsAt, Carbon $endsAt): DashboardPeriodData
     {
-        $presentCount = $this->dashboardRepository->countAppointmentsByPresence(
+        $presentCount = $this->dashboardRepository->countPresentAppointments(
             $startsAt,
             $endsAt,
-            PresenceEnum::PRESENT,
         );
         $pendingCount = $this->dashboardRepository->countAppointmentsByPresence(
             $startsAt,

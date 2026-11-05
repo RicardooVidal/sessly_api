@@ -121,6 +121,26 @@ class SummaryTest extends TestCase
             ->assertJsonPath('data.next_appointments.1.patient.name', $patientB->name);
     }
 
+    #[Test, TestDox('Deve considerar presente a receber como presenca')]
+    public function presenteAReceberContaComoPresenca(): void
+    {
+        $patient = Patient::factory()->create();
+
+        $this->criarConsulta($patient, PresenceEnum::PRESENT, '2026-10-15 09:00:00');
+        $this->criarConsulta($patient, PresenceEnum::PRESENT_TO_RECEIVE, '2026-10-15 10:00:00');
+        $this->criarConsulta($patient, PresenceEnum::ABSENT, '2026-10-15 11:00:00');
+
+        $this->login();
+
+        $this->getJson($this->rota())
+            ->assertOk()
+            ->assertJsonPath('data.today.appointments_count', 3)
+            ->assertJsonPath('data.today.present_count', 2)
+            ->assertJsonPath('data.today.pending_count', 0)
+            ->assertJsonPath('data.today.absent_count', 1)
+            ->assertJsonPath('data.today.attendance_rate', 66.67);
+    }
+
     #[Test, TestDox('Deve retornar zeros quando nao houver dados')]
     public function resumoVazio(): void
     {

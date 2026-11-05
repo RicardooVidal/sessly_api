@@ -22,19 +22,22 @@ class FinanceService
         $endsAt = $period->endsAt($reference);
 
         $appointmentsCount = $this->financeRepository->countPresent($startsAt, $endsAt);
-        $receivableAmount = $this->financeRepository->sumPresentValue($startsAt, $endsAt);
+        $paidAmount = $this->financeRepository->sumPaidValue($startsAt, $endsAt);
+        $receivableAmount = $this->financeRepository->sumPresentToReceiveValue($startsAt, $endsAt);
         $patientsCount = $this->financeRepository->countPresentPatients($startsAt, $endsAt);
         $absencesCount = $this->financeRepository->countAbsent($startsAt, $endsAt);
         $attendanceBase = $appointmentsCount + $absencesCount;
+        $totalPresentAmount = $paidAmount + $receivableAmount;
 
         return new FinanceSummaryData(
             period: $period,
             startsAt: $startsAt,
             endsAt: $endsAt,
             appointmentsCount: $appointmentsCount,
+            paidAmount: round($paidAmount, 2),
             receivableAmount: round($receivableAmount, 2),
             averageTicket: $appointmentsCount > 0
-                ? round($receivableAmount / $appointmentsCount, 2)
+                ? round($totalPresentAmount / $appointmentsCount, 2)
                 : 0.0,
             patientsCount: $patientsCount,
             absencesCount: $absencesCount,

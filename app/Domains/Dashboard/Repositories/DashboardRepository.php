@@ -37,6 +37,14 @@ class DashboardRepository
             ->count();
     }
 
+    public function countPresentAppointments(Carbon $startsAt, Carbon $endsAt): int
+    {
+        return $this->appointment->newQuery()
+            ->whereBetween('date', [$startsAt, $endsAt])
+            ->whereIn('presence', PresenceEnum::presentStatuses())
+            ->count();
+    }
+
     public function countActivePatients(): int
     {
         return $this->patient->newQuery()

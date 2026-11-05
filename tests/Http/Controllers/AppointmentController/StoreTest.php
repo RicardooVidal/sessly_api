@@ -2,16 +2,10 @@
 
 namespace Http\Controllers\AppointmentController;
 
-use App\Domains\Appointment\Entities\Appointment;
-use App\Domains\Appointment\Enums\AppointmentTimeEnum;
-use App\Domains\Appointment\Enums\AppointmentTypeEnum;
 use App\Domains\Patient\Entities\Patient;
 use App\Enums\PresenceEnum;
-use App\Exceptions\PatientNotActiveException;
 use App\Http\Controllers\AppointmentController;
-use App\Http\Controllers\PatientController;
 use Carbon\Carbon;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\URL;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -59,7 +53,7 @@ class StoreTest extends TestCase
             'date' => $date->format('Y-m-d'),
             'presence' => $this->faker->randomElement(PresenceEnum::cases())->value,
             'value' => 35.50,
-            'notes' => $this->faker->text
+            'notes' => $this->faker->text,
         ];
 
         $this->login();
@@ -74,6 +68,29 @@ class StoreTest extends TestCase
         $response->assertJsonPath('data.presence', $parametros['presence']);
         $response->assertJsonPath('data.value', $parametros['value']);
         $response->assertJsonPath('data.notes', $parametros['notes']);
+    }
+
+    #[Test, TestDox('Deve cadastrar uma consulta como presente a receber')]
+    public function sucessoPresenteAReceber(): void
+    {
+        /** @var Patient $patient */
+        $patient = Patient::factory()->create(['active' => true]);
+
+        $parametros = [
+            'patient' => [
+                'uuid' => $patient->uuid,
+            ],
+            'date' => now()->addDay()->format('Y-m-d'),
+            'presence' => PresenceEnum::PRESENT_TO_RECEIVE->value,
+            'value' => 35.50,
+            'notes' => $this->faker->text,
+        ];
+
+        $this->login();
+
+        $this->postJson($this->rota(), $parametros)
+            ->assertCreated()
+            ->assertJsonPath('data.presence', PresenceEnum::PRESENT_TO_RECEIVE->value);
     }
 
     #[
@@ -92,7 +109,7 @@ class StoreTest extends TestCase
             'date' => now()->addDay()->format('Y-m-d'),
             'presence' => $this->faker->randomElement(PresenceEnum::cases())->value,
             'value' => 35.50,
-            'notes' => $this->faker->text
+            'notes' => $this->faker->text,
         ];
 
         $this->login();
@@ -118,7 +135,7 @@ class StoreTest extends TestCase
             'date' => $date->format('Y-m-d'),
             'presence' => $this->faker->randomElement(PresenceEnum::cases())->value,
             'value' => 35.50,
-            'notes' => $this->faker->text
+            'notes' => $this->faker->text,
         ];
 
         $this->postJson($this->rota(), $parametros)
@@ -146,19 +163,19 @@ class StoreTest extends TestCase
     {
         return [
             'patient inválido' => [
-                ['patient' => null]
+                ['patient' => null],
             ],
             'date inválido' => [
-                ['date' => 'invalid-date']
+                ['date' => 'invalid-date'],
             ],
             'date no passado' => [
-                ['date' => now()->subDays(5)->format('Y-m-d')]
+                ['date' => now()->subDays(5)->format('Y-m-d')],
             ],
             'presence inválido' => [
-                ['presence' => 'aaa']
+                ['presence' => 'aaa'],
             ],
             'value inválido' => [
-                ['value' => 'aaa']
+                ['value' => 'aaa'],
             ],
         ];
     }

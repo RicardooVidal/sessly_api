@@ -65,11 +65,38 @@ class SummaryTest extends TestCase
             ->assertJsonPath('data.starts_at', Carbon::parse('2026-10-01 00:00:00')->toW3cString())
             ->assertJsonPath('data.ends_at', Carbon::parse('2026-10-31 23:59:59')->toW3cString())
             ->assertJsonPath('data.appointments_count', 3)
-            ->assertJsonPath('data.receivable_amount', 230)
+            ->assertJsonPath('data.paid_amount', 230)
+            ->assertJsonPath('data.receivable_amount', 0)
             ->assertJsonPath('data.average_ticket', 76.67)
             ->assertJsonPath('data.patients_count', 2)
             ->assertJsonPath('data.absences_count', 1)
             ->assertJsonPath('data.attendance_rate', 75);
+    }
+
+    #[Test, TestDox('Deve separar valores pagos de valores a receber')]
+    public function resumoComPresentesAReceber(): void
+    {
+        $patientA = Patient::factory()->create(['value' => 100.0]);
+        $patientB = Patient::factory()->create(['value' => 200.0]);
+
+        $this->criarConsulta($patientA, PresenceEnum::PRESENT, '2026-10-02 09:00:00', 50.0);
+        $this->criarConsulta($patientA, PresenceEnum::PRESENT, '2026-10-03 09:00:00', 150.0);
+        $this->criarConsulta($patientB, PresenceEnum::PRESENT_TO_RECEIVE, '2026-10-04 09:00:00', 80.0);
+        $this->criarConsulta($patientB, PresenceEnum::PRESENT_TO_RECEIVE, '2026-10-05 09:00:00', null);
+        $this->criarConsulta($patientA, PresenceEnum::ABSENT, '2026-10-06 09:00:00', 30.0);
+        $this->criarConsulta($patientB, PresenceEnum::PENDING, '2026-10-07 09:00:00', 999.0);
+
+        $this->login();
+
+        $this->getJson($this->rota().'?period=month')
+            ->assertOk()
+            ->assertJsonPath('data.appointments_count', 4)
+            ->assertJsonPath('data.paid_amount', 200)
+            ->assertJsonPath('data.receivable_amount', 280)
+            ->assertJsonPath('data.average_ticket', 120)
+            ->assertJsonPath('data.patients_count', 2)
+            ->assertJsonPath('data.absences_count', 1)
+            ->assertJsonPath('data.attendance_rate', 80);
     }
 
     #[Test, TestDox('Deve resumir a semana de segunda a domingo')]
@@ -91,7 +118,8 @@ class SummaryTest extends TestCase
             ->assertJsonPath('data.starts_at', Carbon::parse('2026-10-12 00:00:00')->toW3cString())
             ->assertJsonPath('data.ends_at', Carbon::parse('2026-10-18 23:59:59')->toW3cString())
             ->assertJsonPath('data.appointments_count', 2)
-            ->assertJsonPath('data.receivable_amount', 100)
+            ->assertJsonPath('data.paid_amount', 100)
+            ->assertJsonPath('data.receivable_amount', 0)
             ->assertJsonPath('data.average_ticket', 50)
             ->assertJsonPath('data.patients_count', 1)
             ->assertJsonPath('data.absences_count', 1)
@@ -132,6 +160,7 @@ class SummaryTest extends TestCase
         $this->getJson($this->rota().'?period=month')
             ->assertOk()
             ->assertJsonPath('data.appointments_count', 0)
+            ->assertJsonPath('data.paid_amount', 0)
             ->assertJsonPath('data.receivable_amount', 0)
             ->assertJsonPath('data.average_ticket', 0)
             ->assertJsonPath('data.patients_count', 0)

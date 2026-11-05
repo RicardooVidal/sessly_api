@@ -16,6 +16,7 @@ class FinanceSummaryData extends Data
         public Carbon $startsAt,
         public Carbon $endsAt,
         public int $appointmentsCount,
+        public float $paidAmount,
         public float $receivableAmount,
         public float $averageTicket,
         public int $patientsCount,
