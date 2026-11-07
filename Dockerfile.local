@@ -7,7 +7,10 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     git \
-    libzip-dev
+    libzip-dev \
+    libpng-dev \
+    libjpeg62-turbo-dev \
+    libfreetype6-dev
 
 RUN set -eux \
     && apt-get update \
@@ -16,6 +19,10 @@ RUN set -eux \
 
 # Install and enable the PostgreSQL extensions
 RUN docker-php-ext-install pdo pdo_pgsql pgsql mysqli pdo_mysql
+
+# Install GD for PhpSpreadsheet
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) gd
 
 # Install and enable the Zip extension
 RUN docker-php-ext-install zip

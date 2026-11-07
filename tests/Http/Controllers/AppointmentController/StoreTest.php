@@ -70,6 +70,60 @@ class StoreTest extends TestCase
         $response->assertJsonPath('data.notes', $parametros['notes']);
     }
 
+    #[Test, TestDox('Deve cadastrar uma consulta com valor zerado')]
+    public function sucessoValorZerado(): void
+    {
+        /** @var Patient $patient */
+        $patient = Patient::factory()->create(['active' => true]);
+
+        $parametros = [
+            'patient' => [
+                'uuid' => $patient->uuid,
+            ],
+            'date' => now()->addDay()->format('Y-m-d'),
+            'presence' => PresenceEnum::PRESENT->value,
+            'value' => 0,
+            'notes' => $this->faker->text,
+        ];
+
+        $this->login();
+
+        $response = $this
+            ->postJson($this->rota(), $parametros)
+            ->assertCreated();
+
+        $this->assertEquals(0.0, (float) $response->json('data.value'));
+
+        $this->assertDatabaseHas('appointments', [
+            'patient_id' => $patient->id,
+            'value' => 0,
+            'presence' => PresenceEnum::PRESENT->value,
+        ]);
+    }
+
+    #[Test, TestDox('Deve cadastrar uma consulta com valor vazio')]
+    public function sucessoValorVazio(): void
+    {
+        /** @var Patient $patient */
+        $patient = Patient::factory()->create(['active' => true]);
+
+        $parametros = [
+            'patient' => [
+                'uuid' => $patient->uuid,
+            ],
+            'date' => now()->addDay()->format('Y-m-d'),
+            'presence' => PresenceEnum::PRESENT->value,
+            'value' => '',
+            'notes' => $this->faker->text,
+        ];
+
+        $this->login();
+
+        $this->postJson($this->rota(), $parametros)
+            ->assertCreated()
+            ->assertJsonPath('data.value', null);
+    }
+
     #[Test, TestDox('Deve cadastrar uma consulta como presente a receber')]
     public function sucessoPresenteAReceber(): void
     {

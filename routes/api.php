@@ -9,6 +9,7 @@ use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\GoogleCalendarController;
 use App\Http\Controllers\MedicalRecordController;
 use App\Http\Controllers\PatientController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\WaitListController;
 use App\Http\Middleware\CheckSchema;
 use Illuminate\Http\Request;
@@ -53,6 +54,12 @@ Route::middleware(['auth:sanctum', 'root'])->prefix('admin')->group(function () 
         ->name('admin.companies.update');
 });
 
+Route::get('/reports/download/{tenant}/{report}', [ReportController::class, 'download'])
+    ->where('tenant', '[a-z][a-z0-9_]{0,62}')
+    ->whereUuid('report')
+    ->middleware('signed')
+    ->name('reports.download');
+
 Route::middleware([CheckSchema::class, 'auth:sanctum'])->group(function () {
     Route::resource('patient', PatientController::class)->except(['update']);
     Route::group(['prefix' => 'patient', 'as' => 'patient.'], function () {
@@ -80,6 +87,14 @@ Route::middleware([CheckSchema::class, 'auth:sanctum'])->group(function () {
 
     Route::get('/finance/summary', [FinanceController::class, 'summary'])
         ->name('finance.summary');
+
+    Route::post('/reports', [ReportController::class, 'store'])->name('reports.store');
+    Route::get('/reports/{report}', [ReportController::class, 'show'])
+        ->whereUuid('report')
+        ->name('reports.show');
+    Route::post('/reports/{report}/cancel', [ReportController::class, 'cancel'])
+        ->whereUuid('report')
+        ->name('reports.cancel');
 
     Route::get('/dashboard/summary', [DashboardController::class, 'summary'])
         ->name('dashboard.summary');
