@@ -169,4 +169,55 @@ class ReportWorkbookServiceTest extends TestCase
             $february->getCell('A3')->getValue()
         );
     }
+
+    #[Test, TestDox('Deve deixar uma linha em branco entre pacientes')]
+    public function separaPacientesComLinhaEmBranco(): void
+    {
+        Storage::fake('local');
+
+        $referenceMonth = now()->startOfMonth();
+        $report = Report::query()->create([
+            'reference_month' => $referenceMonth,
+            'status' => ReportStatusEnum::PROCESSING,
+            'total_patients' => 2,
+        ]);
+
+        $path = app(ReportWorkbookService::class)->build('tenant_test', $report, [
+            [
+                'patient_uuid' => 'patient-a',
+                'patient_name' => 'Paciente A',
+                'appointments' => [
+                    [
+                        'date' => $referenceMonth->copy()->addDays(4)->toDateString(),
+                        'effective_value' => 50.0,
+                        'presence' => 'present',
+                        'notes' => null,
+                    ],
+                ],
+            ],
+            [
+                'patient_uuid' => 'patient-b',
+                'patient_name' => 'Paciente B',
+                'appointments' => [
+                    [
+                        'date' => $referenceMonth->copy()->addDays(11)->toDateString(),
+                        'effective_value' => 75.0,
+                        'presence' => 'present',
+                        'notes' => null,
+                    ],
+                ],
+            ],
+        ]);
+
+        $spreadsheet = IOFactory::load(Storage::disk('local')->path($path));
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $this->assertSame('Paciente A', $sheet->getCell('A3')->getValue());
+        $this->assertSame('Pago', $sheet->getCell('A6')->getValue());
+        $this->assertNull($sheet->getCell('A7')->getValue());
+        $this->assertNull($sheet->getCell('B7')->getValue());
+        $this->assertSame('Paciente B', $sheet->getCell('A8')->getValue());
+        $this->assertSame('Pago', $sheet->getCell('A11')->getValue());
+        $this->assertSame('125.00', $sheet->getCell('B2')->getFormattedValue());
+    }
 }

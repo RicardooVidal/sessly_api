@@ -98,7 +98,7 @@ class ReportWorkbookService
 
         foreach ($monthPatients as $patient) {
             $row = $this->writePatientBlock($sheet, $row, $patient);
-            $row++;
+            $row += 2;
         }
 
         $sheet->getColumnDimension('A')->setWidth(18);
