@@ -48,7 +48,7 @@ class GoogleCalendarService
         Carbon $end
     ): ?Event {
         if (!$googleAccount) {
-            Log::warning('Google account not found');
+            return null;
         }
 
         try {
@@ -100,13 +100,17 @@ class GoogleCalendarService
      * @throws Exception
      */
     public function updateMeeting(
-        string $eventId,
-        GoogleAccount $googleAccount,
+        ?string $eventId,
+        ?GoogleAccount $googleAccount,
         string $name,
         Carbon $start,
         Carbon $end
     ): ?Event
     {
+        if (!$eventId || !$googleAccount) {
+            return null;
+        }
+
         try {
             $client = $this->authenticatedClient($googleAccount);
 
@@ -157,10 +161,14 @@ class GoogleCalendarService
      * @throws Exception
      */
     public function deleteMeeting(
-        string $eventId,
-        GoogleAccount $googleAccount,
+        ?string $eventId,
+        ?GoogleAccount $googleAccount,
     ): void
     {
+        if (!$eventId || !$googleAccount) {
+            return;
+        }
+
         try {
             $client = $this->authenticatedClient($googleAccount);
 
