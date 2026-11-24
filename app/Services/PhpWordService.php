@@ -2,8 +2,6 @@
 
 namespace App\Services;
 
-use App\Data\Appointment\ImportMedicalRecordData;
-use DOMDocument;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpWord\Exception\Exception;
@@ -14,6 +12,7 @@ use PhpOffice\PhpWord\Shared\Html;
 class PhpWordService
 {
     private ?string $html = null;
+
     private ?string $filePath = null;
 
     public function setFilePathByUpload(UploadedFile $file): self
@@ -50,7 +49,7 @@ class PhpWordService
 
     public function extractBody(): self
     {
-        if (!$this->html) {
+        if (! $this->html) {
             return $this;
         }
 
@@ -63,7 +62,7 @@ class PhpWordService
 
     public function normalizeHtml(): self
     {
-        if (!$this->html) {
+        if (! $this->html) {
             return $this;
         }
 
@@ -105,11 +104,9 @@ class PhpWordService
     /**
      * @throws Exception
      */
-    public function convertToDocx(string $uuid, string $medicalRecordEncrypted): string
+    public function convertHtmlToDocx(string $uuid, string $html): string
     {
-        $html = $this->normalizeVoidElements(base64_decode($medicalRecordEncrypted));
-
-        $phpWord = new PhpWord();
+        $phpWord = new PhpWord;
 
         $section = $phpWord->addSection();
 
@@ -126,12 +123,16 @@ class PhpWordService
 
         $writer->save($tempFile);
 
-        Storage::put("medical_records/$uuid.html", $html);
         Storage::put("medical_records/$uuid.docx", file_get_contents($tempFile));
 
         unlink($tempFile);
 
         return "medical_records/$uuid.docx";
+    }
+
+    public function normalizeHtmlString(string $html): string
+    {
+        return $this->normalizeVoidElements($html);
     }
 
     private function normalizeVoidElements(string $html): string

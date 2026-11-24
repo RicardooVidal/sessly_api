@@ -37,6 +37,7 @@ class MedicalRecord extends Model
     protected function casts(): array
     {
         return [
+            'record' => 'encrypted',
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
         ];

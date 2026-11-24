@@ -2,10 +2,14 @@
 
 namespace Http\Controllers\AppointmentController;
 
+use App\Domains\Patient\Entities\MedicalRecord;
 use App\Domains\Patient\Entities\Patient;
 use App\Enums\PresenceEnum;
 use App\Http\Controllers\AppointmentController;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -68,6 +72,38 @@ class StoreTest extends TestCase
         $response->assertJsonPath('data.presence', $parametros['presence']);
         $response->assertJsonPath('data.value', $parametros['value']);
         $response->assertJsonPath('data.notes', $parametros['notes']);
+    }
+
+    #[Test, TestDox('Deve salvar o prontuário criptografado no banco e gerar o DOCX')]
+    public function sucessoProntuarioCriptografado(): void
+    {
+        Storage::fake();
+
+        /** @var Patient $patient */
+        $patient = Patient::factory()->create(['active' => true]);
+        $html = '<p>Evolução clínica do paciente</p>';
+
+        $this->login();
+
+        $this->postJson($this->rota(), [
+            'patient' => [
+                'uuid' => $patient->uuid,
+            ],
+            'date' => now()->addDay()->format('Y-m-d'),
+            'presence' => PresenceEnum::PRESENT->value,
+            'value' => 35.50,
+            'notes' => $this->faker->text,
+            'medical_record' => base64_encode($html),
+        ])->assertCreated();
+
+        $record = MedicalRecord::query()->where('patient_id', $patient->id)->sole();
+        $rawRecord = DB::table('medical_records')->where('id', $record->id)->value('record');
+
+        $this->assertSame($html, $record->record);
+        $this->assertStringNotContainsString('<p>', $rawRecord);
+        $this->assertSame($html, Crypt::decryptString($rawRecord));
+        Storage::assertExists([$record->document]);
+        Storage::assertMissing("medical_records/{$patient->uuid}.html");
     }
 
     #[Test, TestDox('Deve cadastrar uma consulta com valor zerado')]

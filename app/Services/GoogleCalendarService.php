@@ -42,11 +42,15 @@ class GoogleCalendarService
      * @throws Exception
      */
     public function createMeeting(
-        GoogleAccount $googleAccount,
+        ?GoogleAccount $googleAccount,
         string $name,
         Carbon $start,
         Carbon $end
     ): ?Event {
+        if (!$googleAccount) {
+            Log::warning('Google account not found');
+        }
+
         try {
             $client = $this->authenticatedClient($googleAccount);
 

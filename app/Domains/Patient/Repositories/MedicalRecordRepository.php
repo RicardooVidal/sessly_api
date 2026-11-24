@@ -11,16 +11,33 @@ class MedicalRecordRepository
         private readonly MedicalRecord $medicalRecord
     ) {}
 
-    public function updatePatientMedicalRecord(Patient $patient, string $filePath): void
+    public function findByPatientUuid(string $patientUuid): ?MedicalRecord
     {
+        return $this->medicalRecord->query()
+            ->whereHas('patient', fn ($query) => $query->where('uuid', $patientUuid))
+            ->first();
+    }
+
+    public function updatePatientMedicalRecord(
+        Patient $patient,
+        ?string $record,
+        ?string $document,
+    ): void {
         $medicalRecord = $this->medicalRecord->query()->where('patient_id', $patient->id)->first();
 
-        if (!$medicalRecord) {
-            $medicalRecord = $this->medicalRecord->query()->make(['document' => $filePath]);
+        if (! $medicalRecord) {
+            $medicalRecord = $this->medicalRecord->query()->make([
+                'record' => $record,
+                'document' => $document,
+            ]);
             $medicalRecord->patient()->associate($patient)->save();
+
             return;
         }
 
-        $medicalRecord->update(['document' => $filePath]);
+        $medicalRecord->update([
+            'record' => $record,
+            'document' => $document,
+        ]);
     }
 }
