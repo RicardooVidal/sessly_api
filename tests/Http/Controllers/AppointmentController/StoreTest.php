@@ -2,16 +2,14 @@
 
 namespace Http\Controllers\AppointmentController;
 
-use App\Domains\Appointment\Entities\Appointment;
-use App\Domains\Appointment\Enums\AppointmentTimeEnum;
-use App\Domains\Appointment\Enums\AppointmentTypeEnum;
+use App\Domains\Patient\Entities\MedicalRecord;
 use App\Domains\Patient\Entities\Patient;
 use App\Enums\PresenceEnum;
-use App\Exceptions\PatientNotActiveException;
 use App\Http\Controllers\AppointmentController;
-use App\Http\Controllers\PatientController;
 use Carbon\Carbon;
-use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
@@ -59,7 +57,7 @@ class StoreTest extends TestCase
             'date' => $date->format('Y-m-d'),
             'presence' => $this->faker->randomElement(PresenceEnum::cases())->value,
             'value' => 35.50,
-            'notes' => $this->faker->text
+            'notes' => $this->faker->text,
         ];
 
         $this->login();
@@ -74,6 +72,115 @@ class StoreTest extends TestCase
         $response->assertJsonPath('data.presence', $parametros['presence']);
         $response->assertJsonPath('data.value', $parametros['value']);
         $response->assertJsonPath('data.notes', $parametros['notes']);
+    }
+
+    #[Test, TestDox('Deve salvar o prontuário criptografado no banco e gerar o DOCX')]
+    public function sucessoProntuarioCriptografado(): void
+    {
+        Storage::fake();
+
+        /** @var Patient $patient */
+        $patient = Patient::factory()->create(['active' => true]);
+        $html = '<p>Evolução clínica do paciente</p>';
+
+        $this->login();
+
+        $this->postJson($this->rota(), [
+            'patient' => [
+                'uuid' => $patient->uuid,
+            ],
+            'date' => now()->addDay()->format('Y-m-d'),
+            'presence' => PresenceEnum::PRESENT->value,
+            'value' => 35.50,
+            'notes' => $this->faker->text,
+            'medical_record' => base64_encode($html),
+        ])->assertCreated();
+
+        $record = MedicalRecord::query()->where('patient_id', $patient->id)->sole();
+        $rawRecord = DB::table('medical_records')->where('id', $record->id)->value('record');
+
+        $this->assertSame($html, $record->record);
+        $this->assertStringNotContainsString('<p>', $rawRecord);
+        $this->assertSame($html, Crypt::decryptString($rawRecord));
+        Storage::assertExists([$record->document]);
+        Storage::assertMissing("medical_records/{$patient->uuid}.html");
+    }
+
+    #[Test, TestDox('Deve cadastrar uma consulta com valor zerado')]
+    public function sucessoValorZerado(): void
+    {
+        /** @var Patient $patient */
+        $patient = Patient::factory()->create(['active' => true]);
+
+        $parametros = [
+            'patient' => [
+                'uuid' => $patient->uuid,
+            ],
+            'date' => now()->addDay()->format('Y-m-d'),
+            'presence' => PresenceEnum::PRESENT->value,
+            'value' => 0,
+            'notes' => $this->faker->text,
+        ];
+
+        $this->login();
+
+        $response = $this
+            ->postJson($this->rota(), $parametros)
+            ->assertCreated();
+
+        $this->assertEquals(0.0, (float) $response->json('data.value'));
+
+        $this->assertDatabaseHas('appointments', [
+            'patient_id' => $patient->id,
+            'value' => 0,
+            'presence' => PresenceEnum::PRESENT->value,
+        ]);
+    }
+
+    #[Test, TestDox('Deve cadastrar uma consulta com valor vazio')]
+    public function sucessoValorVazio(): void
+    {
+        /** @var Patient $patient */
+        $patient = Patient::factory()->create(['active' => true]);
+
+        $parametros = [
+            'patient' => [
+                'uuid' => $patient->uuid,
+            ],
+            'date' => now()->addDay()->format('Y-m-d'),
+            'presence' => PresenceEnum::PRESENT->value,
+            'value' => '',
+            'notes' => $this->faker->text,
+        ];
+
+        $this->login();
+
+        $this->postJson($this->rota(), $parametros)
+            ->assertCreated()
+            ->assertJsonPath('data.value', null);
+    }
+
+    #[Test, TestDox('Deve cadastrar uma consulta como presente a receber')]
+    public function sucessoPresenteAReceber(): void
+    {
+        /** @var Patient $patient */
+        $patient = Patient::factory()->create(['active' => true]);
+
+        $parametros = [
+            'patient' => [
+                'uuid' => $patient->uuid,
+            ],
+            'date' => now()->addDay()->format('Y-m-d'),
+            'presence' => PresenceEnum::PRESENT_TO_RECEIVE->value,
+            'value' => 35.50,
+            'notes' => $this->faker->text,
+        ];
+
+        $this->login();
+
+        $this->postJson($this->rota(), $parametros)
+            ->assertCreated()
+            ->assertJsonPath('data.presence', PresenceEnum::PRESENT_TO_RECEIVE->value);
     }
 
     #[
@@ -92,7 +199,7 @@ class StoreTest extends TestCase
             'date' => now()->addDay()->format('Y-m-d'),
             'presence' => $this->faker->randomElement(PresenceEnum::cases())->value,
             'value' => 35.50,
-            'notes' => $this->faker->text
+            'notes' => $this->faker->text,
         ];
 
         $this->login();
@@ -118,7 +225,7 @@ class StoreTest extends TestCase
             'date' => $date->format('Y-m-d'),
             'presence' => $this->faker->randomElement(PresenceEnum::cases())->value,
             'value' => 35.50,
-            'notes' => $this->faker->text
+            'notes' => $this->faker->text,
         ];
 
         $this->postJson($this->rota(), $parametros)
@@ -146,19 +253,19 @@ class StoreTest extends TestCase
     {
         return [
             'patient inválido' => [
-                ['patient' => null]
+                ['patient' => null],
             ],
             'date inválido' => [
-                ['date' => 'invalid-date']
+                ['date' => 'invalid-date'],
             ],
             'date no passado' => [
-                ['date' => now()->subDays(5)->format('Y-m-d')]
+                ['date' => now()->subDays(5)->format('Y-m-d')],
             ],
             'presence inválido' => [
-                ['presence' => 'aaa']
+                ['presence' => 'aaa'],
             ],
             'value inválido' => [
-                ['value' => 'aaa']
+                ['value' => 'aaa'],
             ],
         ];
     }

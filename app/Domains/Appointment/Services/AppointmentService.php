@@ -136,7 +136,8 @@ class AppointmentService
                 auth()->id()
             )->firstOrFail();
         } catch (ModelNotFoundException) {
-            Log::error('Conta do google para o usuário ' . auth()->id() . ' não encontrado!');
+            Log::error('Conta do google para o usuário '.auth()->id().' não encontrado!');
+
             return null;
         }
     }
@@ -146,7 +147,7 @@ class AppointmentService
      */
     private function checkMedicalRecord(AppointmentData $appointmentData): void
     {
-        if ($appointmentData->medicalRecord) {
+        if ($appointmentData->medicalRecord !== null) {
             $this->medicalRecordService->updatePatientMedicalRecord(
                 $appointmentData->patient->uuid,
                 $appointmentData->medicalRecord

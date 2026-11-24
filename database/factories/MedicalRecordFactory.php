@@ -13,7 +13,7 @@ class MedicalRecordFactory extends Factory
     public function definition(): array
     {
         return [
-            'record' => $this->faker->randomNumber(),
+            'record' => '<p>Prontuário de teste</p>',
             'document' => $this->faker->filePath(),
         ];
     }

@@ -15,14 +15,26 @@ enum PresenceEnum: string
     #[Description('Presente')]
     case PRESENT = 'present';
 
+    #[Description('Presente - A receber')]
+    case PRESENT_TO_RECEIVE = 'present_to_receive';
+
     #[Description('Ausente')]
     case ABSENT = 'absent';
+
+    public static function presentStatuses(): array
+    {
+        return [
+            self::PRESENT,
+            self::PRESENT_TO_RECEIVE,
+        ];
+    }
 
     public static function statusForCreateNewAppointmentAutomatically(): array
     {
         return [
-          self::PRESENT,
-          self::ABSENT,
+            self::PRESENT,
+            self::PRESENT_TO_RECEIVE,
+            self::ABSENT,
         ];
     }
 }

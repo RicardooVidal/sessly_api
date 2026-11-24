@@ -17,7 +17,7 @@ class FinanceRepository
     public function countPresent(Carbon $startsAt, Carbon $endsAt): int
     {
         return $this->queryForPeriod($startsAt, $endsAt)
-            ->where('appointments.presence', PresenceEnum::PRESENT)
+            ->whereIn('appointments.presence', PresenceEnum::presentStatuses())
             ->count('appointments.id');
     }
 
@@ -31,16 +31,24 @@ class FinanceRepository
     public function countPresentPatients(Carbon $startsAt, Carbon $endsAt): int
     {
         return $this->queryForPeriod($startsAt, $endsAt)
-            ->where('appointments.presence', PresenceEnum::PRESENT)
+            ->whereIn('appointments.presence', PresenceEnum::presentStatuses())
             ->distinct()
             ->count('appointments.patient_id');
     }
 
-    public function sumPresentValue(Carbon $startsAt, Carbon $endsAt): float
+    public function sumPaidValue(Carbon $startsAt, Carbon $endsAt): float
     {
         return (float) $this->queryForPeriod($startsAt, $endsAt)
             ->join('patients', 'patients.id', '=', 'appointments.patient_id')
             ->where('appointments.presence', PresenceEnum::PRESENT)
+            ->sum(DB::raw('COALESCE(appointments.value, patients.value, 0)'));
+    }
+
+    public function sumPresentToReceiveValue(Carbon $startsAt, Carbon $endsAt): float
+    {
+        return (float) $this->queryForPeriod($startsAt, $endsAt)
+            ->join('patients', 'patients.id', '=', 'appointments.patient_id')
+            ->where('appointments.presence', PresenceEnum::PRESENT_TO_RECEIVE)
             ->sum(DB::raw('COALESCE(appointments.value, patients.value, 0)'));
     }
 

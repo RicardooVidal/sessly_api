@@ -2,6 +2,7 @@
 
 namespace Tests\Http\Controllers\MedicalRecordController;
 
+use App\Domains\Patient\Entities\MedicalRecord;
 use App\Domains\Patient\Entities\Patient;
 use App\Http\Controllers\MedicalRecordController;
 use Illuminate\Support\Facades\Storage;
@@ -34,7 +35,7 @@ class ShowTest extends TestCase
         Storage::fake();
         $patient = Patient::factory()->create();
         $html = '<p>Anotações da sessão 📝</p>';
-        Storage::put("medical_records/{$patient->uuid}.html", $html);
+        MedicalRecord::factory()->withPatient($patient)->create(['record' => $html]);
 
         $this->login();
 
