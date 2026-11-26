@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install \
         pdo_pgsql \
         pgsql \
+        pcntl \
         zip \
         gd \
     && pecl install redis \
@@ -33,7 +34,7 @@ RUN composer install \
     --no-interaction \
     --prefer-dist \
     --no-scripts \
-    --optimize-autoloader
+    --no-autoloader
 
 # Copiar aplicação
 COPY . .
@@ -47,6 +48,7 @@ RUN mkdir -p \
         storage/framework/views \
         storage/logs \
         bootstrap/cache \
+    && composer dump-autoload --no-dev --optimize --no-interaction \
     && chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 

@@ -10,10 +10,14 @@ use App\Http\Controllers\GoogleCalendarController;
 use App\Http\Controllers\MedicalRecordController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\TelescopeAccessController;
 use App\Http\Controllers\WaitListController;
 use App\Http\Middleware\CheckSchema;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
+Route::post('/telescope-access', [TelescopeAccessController::class, 'store'])
+    ->middleware('throttle:10,1');
 
 Route::get('/user', function (Request $request) {
     return response()->json(['data' => $request->user()]);
