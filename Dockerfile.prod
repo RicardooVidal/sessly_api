@@ -46,4 +46,4 @@ RUN mkdir -p \
 
 EXPOSE 9000
 
-CMD ["php-fpm"]
+CMD ["composer install", "php-fpm"]
